@@ -36,8 +36,8 @@ describe DustTactics::Board do
   end
   
   it "should calculate the shortest path between two points" do
-    @board.shortest_path([0,0], [0,2]).should ==
-      [ [0,0], [0,1], [0,2] ]
+    @board.shortest_path([0,0], [0,3]).should ==
+      [ [0,0], [0,1], [0,2], [0,3] ]
   end
 end
 

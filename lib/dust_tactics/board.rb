@@ -16,7 +16,7 @@ module DustTactics
     # based off of http://www.oop.rwth-aachen.de/documents/oop-2007/sss-oop-2007.pdf
     def shortest_path(start_pt, end_pt)
       distance_hash = get_distance_hash(start_pt, end_pt)
-      trace_path(distance_hash)
+      #trace_path(distance_hash)
     end
 
     # trace a path by finding any set of decremental values from the end point to the start
@@ -26,27 +26,37 @@ module DustTactics
 
     # calculate the distance value of adjacent squares; radiating outward via get_neighbors()
     def get_distance_hash(start_pt, end_pt)
-      processed = {}
-      processed[0] = start_pt
-      distance = 1
-      neighbors = get_neighbors(*start_pt)
+      processed     = {}
+      processed[0]  = [start_pt]
+      distance      = 1
+      neighbors     = get_neighbors(*start_pt)
+      
       puts "start point #{start_pt.inspect} get_neighbors returned #{neighbors.inspect}"
 
-      unless neighbors.include?(end_pt)
+      # NOTE: "unless neighbors.include?(end_pt)" DOES NOT WORK for some reason...
+      while neighbors.include?(end_pt) == false
         processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
         puts "processed a is #{processed.inspect}"
+        
+        # get the next batch of neighbors for each neighbor previously discovered
         neighbors = neighbors.inject(Array.new) do |memo, neighbor|
-          puts "processed b is #{processed.inspect}"
           puts "Running it on #{neighbor.inspect}"
           puts "memo was #{memo.inspect}"
-          memo += get_neighbors(*neighbor).select { |neighbor| not memo.include?(neighbor) and
-                                                    not processed.values.include?(neighbor)}
+          
+          # fetch and filter
+          memo += get_neighbors(*neighbor).reject do |neighbor| 
+            memo.include?(neighbor) == true or 
+              processed.each_value.any? { |point| point.include?(neighbor) }
+          end
+
           puts "memo is now #{memo.inspect}"
           memo
         end
         distance += 1
       end
          
+      puts "neighbors final value #{neighbors}"
+      puts "end_point is #{end_pt}"
       processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
       processed
     end
@@ -72,7 +82,4 @@ module DustTactics
       end
     end
   end
-
-  b = Board.new 4,4
-  b.shortest_path [0,0], [0,2]
 end
