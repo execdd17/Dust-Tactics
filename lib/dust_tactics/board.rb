@@ -14,29 +14,47 @@ module DustTactics
     end
 
     # based off of http://www.oop.rwth-aachen.de/documents/oop-2007/sss-oop-2007.pdf
-    # calculate the point value of every square in the grid, trace a path
-    # by finding any set of decremental values from the end point to the start
     def shortest_path(start_pt, end_pt)
-      problem_space = [[]]
-      queue = [start_pt]
+      distance_hash = get_distance_hash(start_pt, end_pt)
+      trace_path(distance_hash)
+    end
 
-      begin
-        begin 
-          next_pt = queue.pop
-        end while problem_space.include?(next_pt)
-        
-        problem_space << next_pt
-        neighbors = neighbors(*next_pt)
-        queue     += neighbors
-      end while neighbors.include?(end_pt) == false 
-      problem_space
+    # trace a path by finding any set of decremental values from the end point to the start
+    def trace_path(distance_hash)
+    
+    end
+
+    # calculate the distance value of adjacent squares; radiating outward via get_neighbors()
+    def get_distance_hash(start_pt, end_pt)
+      processed = {}
+      processed[0] = start_pt
+      distance = 1
+      neighbors = get_neighbors(*start_pt)
+      puts "start point #{start_pt.inspect} get_neighbors returned #{neighbors.inspect}"
+
+      unless neighbors.include?(end_pt)
+        processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
+        puts "processed a is #{processed.inspect}"
+        neighbors = neighbors.inject(Array.new) do |memo, neighbor|
+          puts "processed b is #{processed.inspect}"
+          puts "Running it on #{neighbor.inspect}"
+          puts "memo was #{memo.inspect}"
+          memo += get_neighbors(*neighbor).select { |neighbor| not memo.include?(neighbor) and
+                                                    not processed.values.include?(neighbor)}
+          puts "memo is now #{memo.inspect}"
+          memo
+        end
+        distance += 1
+      end
+         
+      processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
+      processed
     end
     
     # calculate the adjacent 4 points and remove any that are out of bounds
     # NOTE: should always return UP, DOWN, LEFT, RIGHT (minus the out of
     # bounds)
-    def neighbors(x,y)
-      puts "calling neighbors on #{x} #{y}"
+    def get_neighbors(x,y)
       unchecked = [ [x-1,y], [x+1, y], [x,y-1], [x,y+1] ]
       unchecked.select do |neighbor|
           neighbor[0] >= 0 and neighbor[0] < @grid.length and
@@ -44,6 +62,7 @@ module DustTactics
       end
     end
 
+    # simple visual of the x,y points for the board
     def visual_aid
       @grid.each_with_index do |row, row_index|
         row.each_with_index do |col, col_index|
@@ -55,5 +74,5 @@ module DustTactics
   end
 
   b = Board.new 4,4
-  b.shortest_path [0,0], [1,3]
+  b.shortest_path [0,0], [0,2]
 end
