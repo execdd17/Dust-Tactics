@@ -144,6 +144,14 @@ end
 
 describe DustTactics::Space do
 
+  before(:each) do
+    @space = Space.new
+  end
+
+  it "should not be occupied when first created" do
+    
+  end
+
 end
 
 describe DustTactics::Unit do
