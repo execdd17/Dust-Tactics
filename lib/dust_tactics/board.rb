@@ -30,11 +30,14 @@ module DustTactics
       processed[0]  = [start_pt]
       distance      = 1
       neighbors     = get_neighbors(*start_pt)
+
+      # case where start_end end are equivalent
+      return {0 => [start_pt]} if start_pt == end_pt 
       
       puts "start point #{start_pt.inspect} get_neighbors returned #{neighbors.inspect}"
 
       # NOTE: "unless neighbors.include?(end_pt)" DOES NOT WORK for some reason...
-      while neighbors.include?(end_pt) == false
+      while neighbors.include?(end_pt) == false and processed.each_value.none? { |pts| pts == [] }
         processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
         puts "processed a is #{processed.inspect}"
         
@@ -57,8 +60,20 @@ module DustTactics
          
       puts "neighbors final value #{neighbors}"
       puts "end_point is #{end_pt}"
+      return {} if processed.values.last == [] #the didn't find end_pt case
       processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
       processed
+    end
+
+    # given two arrays in the form [x,y], determine if they are adjacent;
+    # diagonals are not considered adjacent in the this implementation
+    def adjacent?(start_pt, end_pt)
+      up    = [start_pt.first - 1, start_pt.last] == end_pt
+      down  = [start_pt.first + 1, start_pt.last] == end_pt
+      left  = [start_pt.first, start_pt.last - 1] == end_pt
+      right = [start_pt.first, start_pt.last + 1] == end_pt
+      
+      up or down or left or right
     end
     
     # calculate the adjacent 4 points and remove any that are out of bounds
