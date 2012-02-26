@@ -97,9 +97,23 @@ describe DustTactics::Board do
     @board.adjacent?( [2,2], [1,3] ).should == false
   end
 
-  it "should calculate the shortest path between two points" do
-    @board.shortest_path([0,0], [0,3]).should ==
-      [ [0,0], [0,1], [0,2], [0,3] ]
+  it "should calculate the shortest path between two identical points" do
+    @board.shortest_path([0,0], [0,0]).should == [ [0,0] ]
+  end
+
+  it "should calculate the shortest path between two points of distance 1" do
+    @board.shortest_path([0,0], [1,0]).should == [ [0,0], [1,0] ]
+  end
+  
+  it "should calculate the shortest path between two points of distance 2 that do not include diagonals" do
+    
+    @board.shortest_path([0,0], [0,2]).should == [ [0,0], [0,1], [0,2] ]
+  end
+  
+  it "should calculate the shortest path between two points of distance 2 that include diagonals" do
+    correct_answers = [ [[0,0], [0,1], [1,1]], [[0,0], [1,0], [1,1]] ]
+    path = @board.shortest_path([0,0], [1,1])
+    correct_answers.include?(path).should == true
   end
 end
 

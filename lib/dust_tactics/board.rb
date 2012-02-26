@@ -16,12 +16,17 @@ module DustTactics
     # based off of http://www.oop.rwth-aachen.de/documents/oop-2007/sss-oop-2007.pdf
     def shortest_path(start_pt, end_pt)
       distance_hash = get_distance_hash(start_pt, end_pt)
-      #trace_path(distance_hash)
+      trace_path(distance_hash, end_pt)
     end
 
     # trace a path by finding any set of decremental values from the end point to the start
-    def trace_path(distance_hash)
-    
+    def trace_path(distance_hash, end_pt)
+      distance_hash.delete(distance_hash.length() -1)
+      path = [end_pt]
+      distance_hash.reverse_each do |distance, points|
+        path.insert 0, points.detect { |point| adjacent?(point, path.first) }
+      end
+      path
     end
 
     # calculate the distance value of adjacent squares; radiating outward via get_neighbors()
@@ -34,17 +39,17 @@ module DustTactics
       # case where start_end end are equivalent
       return {0 => [start_pt]} if start_pt == end_pt 
       
-      puts "start point #{start_pt.inspect} get_neighbors returned #{neighbors.inspect}"
+      #puts "start point #{start_pt.inspect} get_neighbors returned #{neighbors.inspect}"
 
       # NOTE: "unless neighbors.include?(end_pt)" DOES NOT WORK for some reason...
       while neighbors.include?(end_pt) == false and processed.each_value.none? { |pts| pts == [] }
         processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
-        puts "processed a is #{processed.inspect}"
+        #puts "processed a is #{processed.inspect}"
         
         # get the next batch of neighbors for each neighbor previously discovered
         neighbors = neighbors.inject(Array.new) do |memo, neighbor|
-          puts "Running it on #{neighbor.inspect}"
-          puts "memo was #{memo.inspect}"
+          #puts "Running it on #{neighbor.inspect}"
+          #puts "memo was #{memo.inspect}"
           
           # fetch and filter
           memo += get_neighbors(*neighbor).reject do |neighbor| 
@@ -52,14 +57,14 @@ module DustTactics
               processed.each_value.any? { |point| point.include?(neighbor) }
           end
 
-          puts "memo is now #{memo.inspect}"
+          #puts "memo is now #{memo.inspect}"
           memo
         end
         distance += 1
       end
          
-      puts "neighbors final value #{neighbors}"
-      puts "end_point is #{end_pt}"
+      #puts "neighbors final value #{neighbors}"
+      #puts "end_point is #{end_pt}"
       return {} if processed.values.last == [] #the didn't find end_pt case
       processed[distance] = processed[distance] ? processed[distance] += neighbors : neighbors
       processed
