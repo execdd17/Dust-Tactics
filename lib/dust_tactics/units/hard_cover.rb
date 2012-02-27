@@ -11,6 +11,10 @@ module DustTactics
         super(STARTING_HIT_POINTS, TYPE, ARMOR, MOVEMENT)
       end
 
+      def cover?
+        true
+      end
+
     end
   end
 end

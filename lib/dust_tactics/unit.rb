@@ -10,5 +10,11 @@ module DustTactics
     def take_damage(amount)
       @hit_points -= amount
     end
+
+    # default value for a unit, override in the subclass if its a cover unit
+    def cover?
+      false
+    end
+
   end
 end
