@@ -24,12 +24,12 @@ describe DustTactics::Space do
 
   it "should allow a non-cover unit to placed on it" do
     @space.occupy(@unit_stub)
-    @space.resident.should == [@unit_stub]
+    @space.non_cover.should == @unit_stub
   end
   
   it "should allow a cover unit to placed on it" do
-    @space.occupy(@unit_stub)
-    @space.resident.should == [@unit_stub]
+    @space.occupy(@cover_unit_stub)
+    @space.cover.should == @cover_unit_stub
   end
 
   it "should allow a cover unit to be removed from it" do
@@ -69,14 +69,16 @@ describe DustTactics::Space do
 
   it "should allow a non-cover and then cover to be placed" do
     @space.occupy(@unit_stub)
-    @space.occupy(@cover_unit_stub).should == [@cover_unit_stub, @unit_stub]
+    @space.occupy(@cover_unit_stub)
+    [@space.cover, @space.non_cover].should == [@cover_unit_stub, @unit_stub]
   end
   
   it "should allow a cover and then a non-cover to be placed" do
     @space.occupy(@cover_unit_stub)
-    @space.occupy(@unit_stub).should == [@cover_unit_stub, @unit_stub]
+    @space.occupy(@unit_stub)
+    [@space.cover, @space.non_cover].should == [@cover_unit_stub, @unit_stub]
   end
-
+  
   it "should raise an exception when attempting to place two units that are
     both not cover" do
     @space.occupy(@unit_stub)
@@ -84,14 +86,9 @@ describe DustTactics::Space do
   end
 
   it "should raise an exception when attempting to place two cover units" do
-    @space.occupy(@cover_unit_stub)
-    lambda { @space.occupy(@cover_unit_stub2) }.should raise_error CoverExists
-  end
-
-  it "should raise an exception when attempting to place the same unit twice" do
-    unit_stub = Object.new
-    @space.occupy unit_stub
-    lambda { @space.occupy unit_stub }.should raise_error DuplicateOccupation
+    soft_cover, hard_cover = Units::SoftCover.new, Units::HardCover.new
+    @space.occupy(soft_cover)
+    lambda { @space.occupy(hard_cover) }.should raise_error CoverExists
   end
 
 end

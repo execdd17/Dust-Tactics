@@ -8,27 +8,25 @@ class DuplicateOccupation < Exception; end
 module DustTactics
   class Space
 
-    attr_reader :resident
+    attr_reader :cover, :non_cover
 
     def initialize
-      @resident = []
+      @cover = @non_cover = nil
     end
  
     def occupy(resident)
-      if not empty? and @resident.length < 2 then
-        if @resident.first == resident then
-          raise DuplicateOccupation
-        elsif @resident.first.cover? and not resident.cover? then
-          @resident.insert(1, resident) #non-cover is index 1
-        elsif not @resident.first.cover? and resident.cover? then
-          @resident.insert(0, resident) #cover is index 0
-        elsif @resident.first.cover? and resident.cover? then
-          raise CoverExists
-        elsif not @resident.first.cover? and not resident.cover? then
-          raise SpaceOccupied
+      if not empty?
+        if @cover and not resident.cover? then  
+          @non_cover  = resident  #place new unit with cover
+        elsif @non_cover and resident.cover? then 
+          @cover      = resident  #place new cover with unit       
+        elsif @cover and resident.cover? then
+          raise CoverExists       # cover on cover
+        elsif @non_cover and not resident.cover? then
+          raise SpaceOccupied     # non_cover on non_cover
         end
       else 
-        @resident = [resident]
+        resident.cover? ? @cover = resident : @non_cover = resident
       end
     end
 
@@ -36,18 +34,18 @@ module DustTactics
       raise(IllegalEviction, "That's just not ethical") if empty?
       case type
       when :cover then
-        raise IllegalEviction unless @resident.one? { |unit| unit.cover? }
-        @resident.delete @resident.first
+        raise IllegalEviction unless @cover
+        @cover      = nil
       when :unit then
-        raise IllegalEviction unless @resident.one? { |unit| not unit.cover? }
-        @resident.delete @resident.last
+        raise IllegalEviction unless @non_cover
+        @non_cover  = nil
       when :all then
-        @resident.clear
+        @cover = @non_cover = nil
       end
     end
 
     def empty?
-      @resident.empty? ? true : false
+      not (@cover or @non_cover)
     end
   end
 end
