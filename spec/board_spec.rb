@@ -144,6 +144,10 @@ describe DustTactics::Board do
     it "should return a space object when passed a tuple" do
       (Space === @board.space([0,0])).should == true
     end
+
+    it "should return a space when passed two args x and y" do
+      (Space === @board.space(0,0)).should == true
+    end
   end
 
   context "#rand_point" do
@@ -187,4 +191,20 @@ describe DustTactics::Board do
       moves.flatten.include?(start_pt).should == false
     end
   end
+
+  context "#visual_aid" do
+    it "should print a simple graph demonstrating the board indexes" do
+      @board.respond_to?(:visual_aid).should == true
+      silence { @board.visual_aid }
+    end
+  end
+end
+
+# run a block with stdout redirected to /dev/null
+def silence
+  orig_stdout = $stdout
+  $stdout = File.new('/dev/null', 'w')
+  yield
+ensure
+  $stdout = orig_stdout
 end

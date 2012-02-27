@@ -1,7 +1,8 @@
-module Interactable
-  def move(board, start_pt, end_pt)
-    board.space(start_pt).evict(:unit)
-    board.space(end_pt).occupy(self)
+module DustTactics::Interactable
+  def move(end_space)
+    @space.evict(:unit)
+    end_space.occupy(self)
+    @space = end_space
   end
 
   def attack

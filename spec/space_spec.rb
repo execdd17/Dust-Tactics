@@ -100,7 +100,7 @@ describe DustTactics::Space do
   end
 
   it "should provide a tuple for x and y in the form [x, y]" do
-    pending
+    @space.point.should == [@space.x, @space.y]
   end
 
 end

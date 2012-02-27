@@ -99,9 +99,10 @@ module DustTactics
       [ rand(0...(@num_rows)), rand(0...(@num_cols)) ]
     end
 
-    # given an [x,y] coordinate, return the corresponding space
-    def space(point_array)
-      x, y = *point_array
+    # given an [x,y] coordinate or x,y as separate arguments, 
+    # return the corresponding space
+    def space(*args)
+      x, y = *args.flatten
       grid[x][y]
     end
 

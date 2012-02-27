@@ -45,6 +45,10 @@ module DustTactics
       end
     end
 
+    def point
+      [@x, @y]
+    end
+
     def empty?
       not (@cover or @non_cover)
     end

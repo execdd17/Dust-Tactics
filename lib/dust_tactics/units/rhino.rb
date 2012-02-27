@@ -3,7 +3,7 @@ require 'unit'
 module DustTactics::Units
   class Rhino < DustTactics::Unit
     include DustTactics::Weapons
-    include Interactable
+    include DustTactics::Interactable
 
     HIT_POINTS, ARMOR, MOVEMENT, ARMY_POINT = 4, 3, 2, 22
     TYPE = :infantry
