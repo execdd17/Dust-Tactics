@@ -8,10 +8,11 @@ class DuplicateOccupation < Exception; end
 module DustTactics
   class Space
 
-    attr_reader :cover, :non_cover
+    attr_reader :cover, :non_cover, :x, :y
 
-    def initialize
+    def initialize(x_coordinate, y_coordinate)
       @cover = @non_cover = nil
+      @x, @y = x_coordinate, y_coordinate
     end
  
     def occupy(resident)

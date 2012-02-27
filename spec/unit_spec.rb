@@ -32,5 +32,16 @@ describe DustTactics::Unit do
     @unit.army_point.should_not == nil
   end
 
+  it "should be clear its start point when moving" do
+    board, unit = Board.new(4,4), Units::Rhino.new
+    start_pt    = board.rand_point
+    valid_moves = board.valid_moves(start_pt, unit.movement)
+    rand_move   = valid_moves[rand(1..(valid_moves.length))].sample
+
+    board.space(start_pt).occupy(unit)
+    board.space(start_pt).non_cover.move(board, start_pt, rand_move)
+    board.space(start_pt).non_cover.should == nil
+  end
+
 end
 

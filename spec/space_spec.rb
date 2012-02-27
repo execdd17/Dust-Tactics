@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DustTactics::Space do
 
   before(:each) do
-    @space = Space.new
+    @space = Space.new rand(0..10), rand(0..10)
     
     @cover_unit_stub = mock("cover_unit_stub")
     @cover_unit_stub.stub!(:cover?).and_return(true)
@@ -89,6 +89,18 @@ describe DustTactics::Space do
     soft_cover, hard_cover = Units::SoftCover.new, Units::HardCover.new
     @space.occupy(soft_cover)
     lambda { @space.occupy(hard_cover) }.should raise_error CoverExists
+  end
+
+  it "should know its x coordinate on the board" do
+    (Fixnum === @space.x).should == true
+  end
+  
+  it "should know its y coordinate on the board" do
+    (Fixnum === @space.y).should == true
+  end
+
+  it "should provide a tuple for x and y in the form [x, y]" do
+    pending
   end
 
 end

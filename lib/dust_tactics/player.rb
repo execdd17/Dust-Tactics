@@ -1,10 +1,10 @@
 module DustTactics
   class Player
 
-    attr_reader :name, :team, :units
+    attr_reader :name, :team, :units, :board
 
-    def initialize(name, team)
-      @name, @team, @units = name, team, []
+    def initialize(name, team, board)
+      @name, @team, @units, @board = name, team, [], board
     end
 
     def add_unit(unit)

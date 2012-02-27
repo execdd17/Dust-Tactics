@@ -3,7 +3,8 @@ require 'spec_helper'
 describe DustTactics::Player do
 
   before(:each) do
-    @player = Player.new("Franky Four Fingers", "axis")
+    board   = Board.new(4,4)
+    @player = Player.new("Franky Four Fingers", "axis", board)
   end
 
   it "should have a name" do
@@ -33,6 +34,10 @@ describe DustTactics::Player do
   end
 
   it "should remove a unit from his team" do
+    pending
+  end
+
+  it "should move a unit" do
     pending
   end
 

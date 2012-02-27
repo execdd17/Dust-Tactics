@@ -4,6 +4,7 @@ require 'dust_tactics/weapon_line'
 require 'dust_tactics/dice_engine'
 require 'dust_tactics/game_engine'
 require 'dust_tactics/player'
+require 'dust_tactics/interactable'
 
 # require all the files in the weapons directory
 # NOTE: This must be loaded before units since they require weapons

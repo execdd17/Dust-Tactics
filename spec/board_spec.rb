@@ -139,4 +139,52 @@ describe DustTactics::Board do
       correct_answers.include?(path).should == true
     end
   end
+
+  context "#space" do
+    it "should return a space object when passed a tuple" do
+      (Space === @board.space([0,0])).should == true
+    end
+  end
+
+  context "#rand_point" do
+    it "should never return an x value greater than the number of cols" do
+      100.times.any? { @board.rand_point[0] > @board.num_rows }.should == false
+    end
+    
+    it "should never return a y value greater than the number of rows" do
+      100.times.any? { @board.rand_point[1] > @board.num_cols }.should == false
+    end
+    
+    it "should never return an x value less than 0" do
+      100.times.any? { @board.rand_point[0] < 0 }.should == false
+    end
+    
+    it "should never return an y value less than 0" do
+      100.times.any? { @board.rand_point[1] < 0 }.should == false
+    end
+  end
+
+  context "#valid_moves" do
+    it "should return the correct hash for a coner point with a range of 1" do
+      start_pt, range = [0,0], 1
+      correct_hashes = [{ 1 => [ [0,1], [1,0] ] }, { 1 => [ [1,0], [0,1] ] }]
+      correct_hashes.include?(@board.valid_moves(start_pt, range)).should == true
+    end
+    
+    it "should return the correct hash for a point with 4 neighbors with range 1" do
+      start_pt, range = [2,2], 1
+      correct_hash    = { 1 => [ [1,2], [2,1], [3,2], [2,3] ] }
+      
+      @board.valid_moves(start_pt, range)[1].all? do |point|
+        correct_hash[1].any? { |point2| point == point2 }
+      end.should == true
+    end
+
+    it "should not return the start point as a valid move" do
+      start_pt, range   = @board.rand_point, 2
+      moves             = @board.valid_moves(start_pt, range)
+      
+      moves.flatten.include?(start_pt).should == false
+    end
+  end
 end

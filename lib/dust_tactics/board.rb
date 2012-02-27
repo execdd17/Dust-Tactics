@@ -3,12 +3,14 @@ require 'space'
 module DustTactics
   class Board
 
-    attr_reader :grid
+    attr_reader :grid, :num_rows, :num_cols
 
     def initialize(num_rows, num_columns)
+      @num_rows, @num_cols = num_rows, num_columns
+
       @grid = num_rows.times.inject(Array.new) do |row, row_index|
         row << num_columns.times.inject(Array.new) do |col, column_index|
-          col << ::DustTactics::Space.new
+          col << ::DustTactics::Space.new(row_index, column_index)
         end
       end
     end
@@ -92,6 +94,17 @@ module DustTactics
       end
     end
 
+    # return a random [x,y] coordinate on the board
+    def rand_point
+      [ rand(0...(@num_rows)), rand(0...(@num_cols)) ]
+    end
+
+    # given an [x,y] coordinate, return the corresponding space
+    def space(point_array)
+      x, y = *point_array
+      grid[x][y]
+    end
+
     # simple visual of the x,y points for the board
     def visual_aid
       @grid.each_with_index do |row, row_index|
@@ -100,6 +113,35 @@ module DustTactics
         end
         puts
       end
+    end
+
+    def valid_moves(start_pt, range)
+      processed     = {}
+      distance      = 1
+      neighbors     = get_neighbors(*start_pt)
+
+      while distance < range and processed.each_value.none? { |pts| pts == [] }
+        processed[distance] = processed[distance] ? 
+                              processed[distance] += neighbors : neighbors
+
+        # get the next batch of neighbors for each neighbor previously discovered
+        neighbors = neighbors.inject(Array.new) do |memo, neighbor|
+          
+          # fetch and filter
+          memo += get_neighbors(*neighbor).reject do |neighbor| 
+            local_dup  = memo.include?(neighbor) == true
+            global_dup = processed.each_value.any? { |point| point.include?(neighbor) }
+            equal_start_pt = neighbor == start_pt
+            
+            local_dup or global_dup or equal_start_pt
+          end
+          memo
+        end
+        distance += 1
+      end
+      processed[distance] = processed[distance] ? 
+                            processed[distance] += neighbors : neighbors
+      processed
     end
   end
 end
