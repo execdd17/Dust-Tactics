@@ -67,9 +67,14 @@ describe DustTactics::Space do
     lambda { @space.evict(:unit) }.should raise_error IllegalEviction
   end
 
-  it "should allow two units to occupy if one of those is a cover" do
+  it "should allow a non-cover and then cover to be placed" do
     @space.occupy(@unit_stub)
     @space.occupy(@cover_unit_stub).should == [@cover_unit_stub, @unit_stub]
+  end
+  
+  it "should allow a cover and then a non-cover to be placed" do
+    @space.occupy(@cover_unit_stub)
+    @space.occupy(@unit_stub).should == [@cover_unit_stub, @unit_stub]
   end
 
   it "should raise an exception when attempting to place two units that are
