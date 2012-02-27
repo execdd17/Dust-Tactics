@@ -3,8 +3,8 @@ require 'spec_helper'
 describe DustTactics::Unit do
 
   before(:each) do
-    hit_points, type, armor, movement = 3,:infantry,2,1
-    @unit = Unit.new(hit_points, type, armor, movement)
+    hit_points, type, armor, movement, ap = 3, :infantry, 2, 1, 30
+    @unit = Unit.new(hit_points, type, armor, movement, ap)
   end
   
   it "should have hit_points" do
@@ -26,6 +26,10 @@ describe DustTactics::Unit do
   it "should be able to sustain damage to its hit_points" do
     original_hit_points = @unit.hit_points
     @unit.take_damage(1).should == original_hit_points - 1
+  end
+
+  it "should have an army point cost associated with it" do
+    @unit.army_point.should_not == nil
   end
 
 end

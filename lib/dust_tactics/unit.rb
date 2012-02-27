@@ -1,10 +1,11 @@
 module DustTactics
   class Unit
 
-    attr_reader :hit_points, :type, :armor, :movement
+    attr_reader :hit_points, :type, :armor, :movement, :army_point
 
-    def initialize(hit_points, type, armor, movement)
-      @hit_points, @type, @armor, @movement = hit_points, type, armor, movement
+    def initialize(hit_points, type, armor, movement, army_point)
+      @hit_points, @type, @armor, = hit_points, type, armor
+      @movement, @army_point = movement, army_point
     end
 
     def take_damage(amount)
