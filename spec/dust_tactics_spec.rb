@@ -148,12 +148,85 @@ describe DustTactics::Space do
     @space = Space.new
   end
 
-  it "should not be occupied when first created" do
-    
+  it "should be empty when first created" do
+    @space.empty?.should == true
+  end
+
+  it "should allow a unit to placed on it" do
+    unit_stub = Object.new
+    @space.occupy(unit_stub)
+    @space.resident.should == unit_stub
+  end
+
+  it "should allow a unit to be removed from it" do
+    unit_stub = Object.new
+    @space.occupy(unit_stub)
+    @space.evict
+    @space.empty?.should == true
+  end
+
+  it "should raise an exception when attempting to evict an empty space" do
+    lambda { @space.evict }.should raise_error IllegalEviction
   end
 
 end
 
 describe DustTactics::Unit do
 
+  before(:each) do
+    hit_points, armor, movement = 3,2,1
+    @unit = Unit.new(hit_points, armor, movement)
+  end
+
+  it "should have hit_points" do
+    @unit.respond_to?(:hit_points).should == true
+  end
+
+  it "should have an armor type" do
+    @unit.respond_to?(:armor).should == true
+  end
+
+  it "should have a movement rating" do
+    @unit.respond_to?(:movement).should == true
+  end
+
+  it "should be able to sustain damage to its hit_points" do
+    original_hit_points = @unit.hit_points
+    @unit.take_damage(1).should == original_hit_points - 1
+  end
+
+end
+
+describe DustTactics::WeaponLine do
+
+  before(:each) do
+    name, type = "Machine Gun", '4'
+    combat_values = { :infantry => 
+                        { 1 => "6/1", 2 => "4/1", 3 => "3/1", 4 => "2/1"},
+                      :veichle =>
+                        { 1 => "2/1", 2 => "1/1", 3 => "-", 4 => "-"},
+                      :aircraft =>
+                        { 1 => "3/1", 2 => "2/1", 3 => "1/1", 4 => "-"}
+                    }
+    @wl = WeaponLine.new(name, type, combat_values) 
+  end
+
+  it "should have a name" do
+    @wl.respond_to?(:name).should == true
+  end
+
+  it "should have a type" do
+    @wl.respond_to?(:type).should == true
+  end
+
+  it "should have a combat values" do
+    @wl.respond_to?(:combat_values).should == true
+  end
+
+  it "should have a return a combat value given the enemy type and armor" do
+    @wl.get_combat_value(:infantry, 3).should == "3/1"
+  end
+end
+
+describe DustTactics::Units::Rhino do
 end
