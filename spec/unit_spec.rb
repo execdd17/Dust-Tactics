@@ -5,6 +5,9 @@ describe DustTactics::Unit do
   before(:each) do
     hit_points, type, armor, movement, ap = 3, :infantry, 2, 1, 30
     @unit = Unit.new(hit_points, type, armor, movement, ap)
+    
+    board = Board.new(BOARD_ROWS, BOARD_COLUMNS)
+    @space= board.rand_space
   end
   
   it "should have hit_points" do
@@ -33,13 +36,11 @@ describe DustTactics::Unit do
   end
 
   it "should determine when it's inside a space" do
-    space = Space.new(0,0)
-    @unit.deploy(space)
+    @unit.deploy(@space)
     @unit.in_space?.should == true
   end
   
   it "should determine when it's not inside a space" do
-    space = Space.new(0,0)
     @unit.in_space?.should == false
   end
 

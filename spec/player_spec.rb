@@ -39,8 +39,8 @@ describe DustTactics::Player do
   end
 
   it "should move one of its unit and end up there" do
-    start_space = @player.board.space(0,0)
-    end_space   = @player.board.space(0,1)
+    start_space = @player.board.rand_space
+    end_space   = @player.board.rand_space( [start_space] )
   
     @player.add_unit(@unit)
     @unit.deploy(start_space)
@@ -49,8 +49,8 @@ describe DustTactics::Player do
   end
   
   it "should move one of its unit and not still be in the start space" do
-    start_space = @player.board.space(0,0)
-    end_space   = @player.board.space(0,1)
+    start_space = @player.board.rand_space
+    end_space   = @player.board.rand_space( [start_space] )
   
     @player.add_unit(@unit)
     @unit.deploy(start_space)
