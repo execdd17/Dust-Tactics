@@ -29,11 +29,41 @@ describe DustTactics::Interactable do
       @unit.move(rand_space)
       @start_space.non_cover.should == nil
     end
+
+    it "should use the path finding algorithm instead of just plopping down" do
+      pending
+    end
   end
 
   describe "#attack" do
-    it "should work right" do
-      pending
+
+    before(:each) do
+      @board        = Board.new(BOARD_ROWS, BOARD_COLUMNS)
+      @target       = [Units::Rhino.new, Units::Lara.new].sample
+      @unit         = [Units::Rhino.new, Units::Lara.new].sample
+      @weapon_line  = @unit.weapon_lines.first
+      @rand_space1  = @board.rand_space
+      @rand_space2  = @board.rand_space([@rand_space1])
+    end
+
+    it "should raise an exception when attacking a unit not in a space" do
+      @unit.deploy(@rand_space1)
+      lambda { @unit.attack(@target, @target.space, @weapon_line)
+      }.should raise_error InvalidAttack, "The target isn't in a space!"
+    end
+
+    it "should raise an exception when the attacker isn't in a space" do
+     @target.deploy(@rand_space1)
+     lambda { @unit.attack(@target, @target.space, @weapon_line)
+     }.should raise_error InvalidAttack, "The attacker isn't in a space!"
+    end
+
+    it "should raise an exception when attacking with an unsupported weapon type" do
+      @unit.deploy(@rand_space1)
+      @target.deploy(@rand_space2)
+      @weapon_line.instance_eval { @type = "nonsense" }
+      lambda  { @unit.attack(@target, @target.space, @weapon_line) 
+      }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
     end
   end
 
