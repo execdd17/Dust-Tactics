@@ -1,3 +1,5 @@
+class CoverSaveException < Exception; end
+
 module DustTactics
   class GameEngine
 
@@ -9,6 +11,18 @@ module DustTactics
       end while p1_results[:hits] == p2_results[:hits]  #ties are lame
 
       p1_results[:hits] > p2_results[:hits] ? player_one : player_two
+    end
+
+    # Takes a save_type of either :hit or :miss and the number of
+    # unmitigated hits to see whether any damage is negated.
+    # Returns the number of cover saves
+    def self.cover_saves(save_type, num_hits)
+      case save_type
+      when :hit   then DiceEngine.roll(num_hits)[:hits]
+      when :miss  then DiceEngine.roll(num_hits)[:misses]
+      else
+        raise CoverSaveException, "Invalid save_type [#{save_type}]"
+      end
     end
   end
 end
