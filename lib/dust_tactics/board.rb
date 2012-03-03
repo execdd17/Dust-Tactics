@@ -94,6 +94,13 @@ module DustTactics
       end
     end
 
+    def rand_space(blacklist=[])
+      begin
+        space = space(rand_point)
+      end while blacklist.include?(space)
+      space
+    end
+
     # return a random [x,y] coordinate on the board
     def rand_point
       [ rand(0...(@num_rows)), rand(0...(@num_cols)) ]
@@ -103,7 +110,7 @@ module DustTactics
     # return the corresponding space
     def space(*args)
       x, y = *args.flatten
-      grid[x][y]
+      @grid[x][y]
     end
 
     # simple visual of the x,y points for the board

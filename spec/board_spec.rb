@@ -150,6 +150,21 @@ describe DustTactics::Board do
     end
   end
 
+  context "#rand_space" do
+    it "should return a space on the board" do
+      rand_space = @board.rand_space
+
+      @board.grid.one? do |row| 
+        row.one? { |col| col == rand_space }
+      end.should == true
+    end
+
+    it "should not return a space in a supplied blacklist" do
+      bl_space = @board.rand_space
+      100.times { @board.rand_space([bl_space]).should_not == bl_space }
+    end
+  end
+
   context "#rand_point" do
     it "should never return an x value greater than the number of cols" do
       100.times.any? { @board.rand_point[0] > @board.num_rows }.should == false
