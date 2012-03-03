@@ -5,7 +5,7 @@ describe DustTactics::Player do
   before(:each) do
     board   = Board.new(BOARD_ROWS, BOARD_COLUMNS)
     @player = Player.new("Franky Four Fingers", "axis", board)
-    @unit   = Units::Rhino.new
+    @unit   = [Units::Rhino.new, Units::Lara.new].sample
   end
 
   it "should have a name" do
@@ -21,17 +21,16 @@ describe DustTactics::Player do
   end
 
   it "should accept a unit for his team" do
-    unit = Units::Rhino.new
-    @player.add_unit(unit).should == [unit]
+    @player.add_unit(@unit).should == [@unit]
   end
 
   it "should have a total army point cost of 0 without an army" do
     @player.total_ap.should == 0
   end
 
-  it "should have a total of 22 army points after adding Rhino" do
-    @player.add_unit Units::Rhino.new
-    @player.total_ap.should == 22
+  it "should have the correct total of army points after adding a unit" do
+    @player.add_unit(@unit)
+    @player.total_ap.should == @unit.army_point
   end
 
   it "should remove a unit from his team" do
