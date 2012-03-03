@@ -1,3 +1,6 @@
+# Raised when trying to use Unit#deploy more than once
+class InvalidDeployment < Exception; end
+
 module DustTactics
   class Unit
 
@@ -13,9 +16,22 @@ module DustTactics
       @hit_points -= amount
     end
 
-    def occupy(space)
+    # deploys the unit to a space
+    # NOTE: This should only be used for deployment! After that,
+    # a unit that mixed in Interactable should use move()
+    def deploy(space)
+      if @space then
+        raise InvalidDeployment,
+          "Unit already occupies a space, use move() instead" 
+      end
+
       @space = space
       space.occupy(self)
+    end
+
+    # check if self has line of sight to the supplied unit
+    def los?(unit)
+      true  
     end
 
     def in_space?

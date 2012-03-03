@@ -12,7 +12,7 @@ describe DustTactics::Interactable do
       valid_moves = @board.valid_moves(@start_space.point, @unit.movement)
       rand_space  = @board.space(valid_moves[rand(1..(valid_moves.length))].sample)
 
-      @unit.occupy(@start_space)
+      @unit.deploy(@start_space)
       @unit.move(rand_space)
       rand_space.non_cover.should == @unit
     end
@@ -25,7 +25,7 @@ describe DustTactics::Interactable do
       valid_moves = @board.valid_moves(@start_space.point, @unit.movement)
       rand_space  = @board.space(valid_moves[rand(1..(valid_moves.length))].sample)
 
-      @unit.occupy(@start_space)
+      @unit.deploy(@start_space)
       @unit.move(rand_space)
       @start_space.non_cover.should == nil
     end
@@ -46,12 +46,12 @@ describe DustTactics::Interactable do
       @unit1 = [Units::Rhino.new, Units::Lara.new].sample
       @unit2 = [Units::Rhino.new, Units::Lara.new].sample
       
-      @unit1.occupy(space1) 
-      @unit2.occupy(space2)
+      @unit1.deploy(space1) 
+      @unit2.deploy(space2)
     end
   
     it "should return true when one unit has line of sight to the other" do
-      pending
+      @unit1.los?(@unit2).should == true
     end
   end
 end

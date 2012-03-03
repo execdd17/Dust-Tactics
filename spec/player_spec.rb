@@ -43,7 +43,7 @@ describe DustTactics::Player do
     end_space   = @player.board.space(0,1)
   
     @player.add_unit(@unit)
-    @unit.occupy(start_space)
+    @unit.deploy(start_space)
     @player.move_unit(@unit, end_space)
     end_space.non_cover.should == @unit
   end
@@ -53,7 +53,7 @@ describe DustTactics::Player do
     end_space   = @player.board.space(0,1)
   
     @player.add_unit(@unit)
-    @unit.occupy(start_space)
+    @unit.deploy(start_space)
     @player.move_unit(@unit, end_space)
     start_space.non_cover.should == nil
   end

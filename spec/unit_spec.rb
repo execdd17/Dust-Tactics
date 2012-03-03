@@ -34,12 +34,17 @@ describe DustTactics::Unit do
 
   it "should determine when it's inside a space" do
     space = Space.new(0,0)
-    @unit.occupy(space)
+    @unit.deploy(space)
     @unit.in_space?.should == true
   end
   
   it "should determine when it's not inside a space" do
     space = Space.new(0,0)
     @unit.in_space?.should == false
+  end
+
+  it "should raise an exception when attempting to use deploy as a move" do
+    @unit.deploy(Space.new 0,0)
+    lambda { @unit.deploy(Space.new 0,1) }.should raise_error InvalidDeployment
   end
 end
