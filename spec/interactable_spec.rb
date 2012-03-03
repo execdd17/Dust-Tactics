@@ -84,4 +84,52 @@ describe DustTactics::Interactable do
       @unit1.los?(@unit2).should == true
     end
   end
+
+  describe "#weapons_in_range" do
+    before(:each) do
+      @board        = Board.new(6, 6)
+      @rhino        = Units::Rhino.new
+      @lara         = Units::Lara.new
+    end
+
+    it "should return an empty array when Rhino is out of range" do
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,2))
+      wls_in_range = @rhino.weapons_in_range(@board, @lara, @rhino.weapon_lines)
+      wls_in_range.should == []
+    end
+    
+    it "should return 2 weapon lines when Rhino is one space away" do
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,1))
+      wls_in_range = @rhino.weapons_in_range(@board, @lara, @rhino.weapon_lines)
+      wls_in_range.length.should == 2
+    end
+    
+    it "should return both close combat weapon lines when rhino is one space
+      away from lara" do
+      
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,1))
+      wls_in_range = @rhino.weapons_in_range(@board, @lara, @rhino.weapon_lines)
+      wls_in_range.each { |wl| (HeavyRocketPunch === wl).should == true }
+    end
+    
+    it "should return both range weapon lines when Lara is 4 spaces
+      away from Rhino" do
+      
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,4))
+      wls_in_range = @lara.weapons_in_range(@board, @rhino, @lara.weapon_lines)
+      wls_in_range.each { |wl| (MG44Zwei === wl).should == true }
+    end
+    
+    it "should return an empty array when Lara is out of range" do
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,5))
+      wls_in_range = @lara.weapons_in_range(@board, @rhino, @lara.weapon_lines)
+      wls_in_range.should == []
+    end
+    
+    it "should return 3 weapon lines when Lara is 1 space from her target" do
+      @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,1))
+      wls_in_range = @lara.weapons_in_range(@board, @rhino, @lara.weapon_lines)
+      wls_in_range.length.should == 3
+    end
+  end
 end

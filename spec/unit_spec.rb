@@ -39,6 +39,11 @@ describe DustTactics::Unit do
     @unit.deploy(@space)
     @unit.in_space?.should == true
   end
+
+  it "should raise an error when trying to deploy in a nil space" do
+    lambda { @unit.deploy(nil) 
+    }.should raise_error InvalidDeployment, "Deployment Space Invalid"
+  end
   
   it "should determine when it's not inside a space" do
     @unit.in_space?.should == false
