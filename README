@@ -1,0 +1,8 @@
+DESCRIPTION:
+
+My evolving implementation of the game "Dust Tactics" created by Fantasy Flight Games [http://fantasyflightgames.com]
+
+REQUIREMENTS:
+
+Ruby >= 1.9.2
+

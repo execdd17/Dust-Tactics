@@ -65,6 +65,10 @@ describe DustTactics::Interactable do
       lambda  { @unit.attack(@target, @target.space, @weapon_line) 
       }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
     end
+
+    it "should actually attack someone and have them take damage" do
+      pending
+    end
   end
 
   describe "#los?" do
