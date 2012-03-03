@@ -41,11 +41,11 @@ describe DustTactics::Interactable do
     before(:each) do
       board  = Board.new(BOARD_ROWS, BOARD_COLUMNS)
       space1 = board.rand_space 
-      space2 = board.rand_space([@space1])
+      space2 = board.rand_space([space1])
       
       @unit1 = [Units::Rhino.new, Units::Lara.new].sample
       @unit2 = [Units::Rhino.new, Units::Lara.new].sample
-      
+
       @unit1.deploy(space1) 
       @unit2.deploy(space2)
     end
