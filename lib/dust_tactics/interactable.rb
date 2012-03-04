@@ -15,18 +15,22 @@ module DustTactics::Interactable
     @space = end_space
   end
 
-  def attack(target, space, weapon_line)
+  def attack(board, target, weapon_line)
     raise InvalidAttack, "The attacker isn't in a space!" unless
       self.space and self.space.non_cover
 
     raise InvalidAttack, "The target isn't in a space!" unless 
-      space and space.non_cover
+      target.space and target.space.non_cover
+      
+    weapons =  weapons_in_range(board, target, self.weapon_lines)
     
-    case weapon_line.type
-    when /\d/ then              # range attack
-    when 'C' then               # close combat attack
-    else 
-      raise InvalidAttack, "#{weapon_line.type} is not a supported weapon type"
+    if weapons.include?(weapon_line) then
+      case weapon_line.type
+      when /\d/ then              # range attack
+      when 'C' then               # close combat attack
+      end
+    else
+      raise InvalidAttack, "#{weapon_line} is not in range to attack!"
     end
   end
 
@@ -38,6 +42,8 @@ module DustTactics::Interactable
       case wl.type
       when /\d/ then true if wl.type.to_i >= distance_to_target
       when 'C'  then true if 1            == distance_to_target
+      else 
+        raise InvalidAttack, "#{wl.type} is not a supported weapon type"
       end
     end
   end

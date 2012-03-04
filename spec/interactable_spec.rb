@@ -46,23 +46,31 @@ describe DustTactics::Interactable do
       @rand_space2  = @board.rand_space([@rand_space1])
     end
 
+    it "should raise an exception when attacking from out of range" do
+      @unit.deploy(@rand_space1)
+      @target.deploy(@rand_space2)
+      @weapon_line.instance_eval { @type = '0' }  #set range to 0
+      lambda { @unit.attack(@board, @target, @weapon_line)
+      }.should raise_error InvalidAttack, /is not in range to attack!$/
+    end
+
     it "should raise an exception when attacking a unit not in a space" do
       @unit.deploy(@rand_space1)
-      lambda { @unit.attack(@target, @target.space, @weapon_line)
+      lambda { @unit.attack(@board, @target, @weapon_line)
       }.should raise_error InvalidAttack, "The target isn't in a space!"
     end
 
     it "should raise an exception when the attacker isn't in a space" do
      @target.deploy(@rand_space1)
-     lambda { @unit.attack(@target, @target.space, @weapon_line)
+     lambda { @unit.attack(@board, @target, @weapon_line)
      }.should raise_error InvalidAttack, "The attacker isn't in a space!"
     end
 
     it "should raise an exception when attacking with an unsupported weapon type" do
       @unit.deploy(@rand_space1)
       @target.deploy(@rand_space2)
-      @weapon_line.instance_eval { @type = "nonsense" }
-      lambda  { @unit.attack(@target, @target.space, @weapon_line) 
+      @weapon_line.instance_eval { @type = "nonsense"; }
+      lambda  { @unit.attack(@board, @target, @weapon_line) 
       }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
     end
 
