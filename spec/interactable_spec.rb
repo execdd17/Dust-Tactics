@@ -74,8 +74,23 @@ describe DustTactics::Interactable do
       }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
     end
 
-    it "should actually attack someone and have them take damage" do
+    it "should correctly take cover into consideration when attacking" do
       pending
+    end
+
+    it "should correctly cause damage to the target player with a ranged weapon" do
+      pending
+    end
+
+    it "should cause damage to attacker and defender when using close combat" do
+      pending
+    end
+
+    it "should create an 'attack report' that shows the number of dice "     <<
+       "rolled by the attacker and defender, the amount of hits, the amount "<<
+       "of cover saves, and the total damage done. My thought is this will " <<
+       "greatly help testing" do
+         pending
     end
   end
 

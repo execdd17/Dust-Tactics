@@ -9,8 +9,17 @@ module DustTactics
       @name, @type, @combat_values = name, type, combat_values
     end
 
+    def num_dice(enemy_type, armor_rating)
+      cv = get_combat_value(enemy_type, armor_rating)
+      cv == "-" ? 0 : cv.split('/').first.to_i
+    end
+
     def get_combat_value(enemy_type, armor_rating)
       @combat_values[enemy_type][armor_rating]
+    end
+    
+    def close_combat?
+      type == 'C'
     end
   end
 end

@@ -29,4 +29,12 @@ describe DustTactics::WeaponLine do
   it "should have a return a combat value given the enemy type and armor" do
     @wl.get_combat_value(:infantry, 3).should == "3/1"
   end
+
+  it "should know when it's not a close combat type" do
+    @wl.close_combat?.should == false
+  end
+  
+  it "should know when it is a close combat type" do
+    WeaponLine.new("Sharp Stick", 'C', {}).close_combat?.should == true
+  end
 end

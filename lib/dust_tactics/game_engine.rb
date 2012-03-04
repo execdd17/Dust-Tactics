@@ -12,14 +12,23 @@ module DustTactics
 
       p1_results[:hits] > p2_results[:hits] ? player_one : player_two
     end
+  
+    # return the number of hits after cover saves
+    def self.resolve_attack(num_rolls, save_type)
+      raw_hits    = DiceEngine.roll(num_rolls)[:hits]
+      cover_saves = cover_saves(save_type, raw_hits)
+      #puts "raw hits :#{raw_hits} cover saves: #{cover_saves}"
+      [raw_hits - cover_saves, 0].max
+    end
 
     # Takes a save_type of either :hit or :miss and the number of
     # unmitigated hits to see whether any damage is negated.
     # Returns the number of cover saves
-    def self.cover_saves(save_type, num_hits)
+    def self.cover_saves(save_type, raw_hits)
       case save_type
-      when :hit   then DiceEngine.roll(num_hits)[:hits]
-      when :miss  then DiceEngine.roll(num_hits)[:misses]
+      when :hit   then DiceEngine.roll(raw_hits)[:hits]
+      when :miss  then DiceEngine.roll(raw_hits)[:misses]
+      when :none  then 0
       else
         raise CoverSaveException, "Invalid save_type [#{save_type}]"
       end

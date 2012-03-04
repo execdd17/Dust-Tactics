@@ -15,9 +15,43 @@ describe DustTactics::GameEngine do
     end
   end
 
+  context ".resolve attack" do
+    before(:each) do
+      @num_rolls = rand(1..100)  
+    end
+
+    it "should not return less than 0 when subtracting hit cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :hit) }.should be >= 0 
+    end
+    
+    it "should not return less than 0 when subtracting miss cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :miss) }.should be >= 0 
+    end
+    
+    it "should not return less than 0 when subtracting no cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :none) }.should be >= 0 
+    end
+    
+    it "should not return greater than num_rolls with hit cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :hit).should be <= @num_rolls  }
+    end
+    
+    it "should not return greater than num_rolls with miss cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :miss).should be <= @num_rolls  }
+    end
+    
+    it "should not return greater than num_rolls with hit cover saves" do
+      100.times { GameEngine.resolve_attack(@num_rolls, :none).should be <= @num_rolls  }
+    end
+  end
+
   context ".cover_saves" do
     before(:each) do
-      @raw_hits   = rand(0..100)
+      @raw_hits = rand(0..100)
+    end
+
+    it "should return 0 when there is no cover" do
+      GameEngine.cover_saves(:none, @raw_hits).should == 0
     end
 
     it "should return a value greater to or equal zero when given hit" do
