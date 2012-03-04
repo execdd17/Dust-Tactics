@@ -19,29 +19,45 @@ describe DustTactics::GameEngine do
     before(:each) do
       @num_rolls = rand(1..100)  
     end
+    
+    it "should validate that all the hash entries returned" do
+      pending
+    end
 
     it "should not return less than 0 when subtracting hit cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :hit) }.should be >= 0 
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :hit)[:net_hits] 
+      end.should be >= 0 
     end
     
     it "should not return less than 0 when subtracting miss cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :miss) }.should be >= 0 
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :miss)[:net_hits]
+      end.should be >= 0 
     end
     
     it "should not return less than 0 when subtracting no cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :none) }.should be >= 0 
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :none)[:net_hits] 
+      end.should be >= 0 
     end
     
     it "should not return greater than num_rolls with hit cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :hit).should be <= @num_rolls  }
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :hit)[:net_hits].should be <= @num_rolls
+      end
     end
     
     it "should not return greater than num_rolls with miss cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :miss).should be <= @num_rolls  }
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :miss)[:net_hits].should be <= @num_rolls 
+      end
     end
     
     it "should not return greater than num_rolls with hit cover saves" do
-      100.times { GameEngine.resolve_attack(@num_rolls, :none).should be <= @num_rolls  }
+      100.times do 
+        GameEngine.resolve_attack(@num_rolls, :none)[:net_hits].should be <= @num_rolls 
+      end
     end
   end
 

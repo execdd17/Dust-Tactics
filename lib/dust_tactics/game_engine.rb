@@ -13,12 +13,18 @@ module DustTactics
       p1_results[:hits] > p2_results[:hits] ? player_one : player_two
     end
   
-    # return the number of hits after cover saves
     def self.resolve_attack(num_rolls, save_type)
       raw_hits    = DiceEngine.roll(num_rolls)[:hits]
       cover_saves = cover_saves(save_type, raw_hits)
-      #puts "raw hits :#{raw_hits} cover saves: #{cover_saves}"
-      [raw_hits - cover_saves, 0].max
+      
+      { 
+        :num_rolls    => num_rolls,
+        :save_type    => save_type,
+        :raw_hits     => raw_hits, 
+        :hit_ratio    => (raw_hits.to_f / num_rolls).round(4),
+        :cover_saves  => cover_saves,
+        :net_hits     => [raw_hits - cover_saves, 0].max
+      }
     end
 
     # Takes a save_type of either :hit or :miss and the number of

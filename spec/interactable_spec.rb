@@ -79,19 +79,60 @@ describe DustTactics::Interactable do
     end
 
     it "should correctly cause damage to the target player with a ranged weapon" do
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,2))
+      rhino_initial_hp = rhino.hit_points
+
+      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      battle_report = lara.attack(@board, rhino, ranged_weapon)
+      expected_hp   = rhino_initial_hp - battle_report[:attacker][:net_hits]
+      rhino.hit_points.should ==  expected_hp   
+    end
+
+    it "should cause damage to the defender when using close combat" do
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      lara_initial_hp = lara.hit_points
+
+      cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
+      battle_report = rhino.attack(@board, lara, cc_weapon)
+      expected_hp   = lara_initial_hp - battle_report[:attacker][:net_hits]
+      lara.hit_points.should ==  expected_hp   
+    end
+    
+    it "should cause damage to the attaker when both parties have cc weapons" do
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      rhino_initial_hp = rhino.hit_points
+
+      cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
+      battle_report = rhino.attack(@board, lara, cc_weapon)
+      expected_hp   = rhino_initial_hp - battle_report[:defender][:net_hits]
+      rhino.hit_points.should ==  expected_hp   
+    end
+
+    it "should return a battle report containing attacker data " <<
+       "when both units have close combat weapons to attack with" do
+
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      battle_report = rhino.attack(@board, lara, rhino.weapon_lines.first) 
+      battle_report[:attacker].should_not be nil
+    end
+    
+    it "should return a battle report containing defender data " <<
+       "when both units have close combat weapons to attack with" do
+
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      battle_report = rhino.attack(@board, lara, rhino.weapon_lines.first) 
+      battle_report[:defender].should_not be nil
+    end
+
+    it "should have the ability to attack with ALL available weapon lines" do
       pending
     end
 
-    it "should cause damage to attacker and defender when using close combat" do
-      pending
-    end
-
-    it "should create an 'attack report' that shows the number of dice "     <<
-       "rolled by the attacker and defender, the amount of hits, the amount "<<
-       "of cover saves, and the total damage done. My thought is this will " <<
-       "greatly help testing" do
-         pending
-    end
   end
 
   describe "#los?" do
