@@ -59,7 +59,18 @@ describe DustTactics::GameEngine do
   
   describe ".combine_report" do
 
-    it "should take a battle report and combine a new attacker's report" do
+    it "should merge the player report into the battle_report when it " <<
+       "has not yet been initialized" do
+
+      battle_report   = {}
+      defender_report = { :num_rolls => 40, :save_type => :hard, :raw_hits => 20, 
+                          :hit_ratio => 0.5, :cover_saves => 15, :net_hits => 5}
+      
+      br = GameEngine.combine_reports(battle_report, defender_report, :defender)
+      br.should == {:defender => defender_report}
+    end
+
+    it "should take a battle report and combine a new player's report" do
       battle_report = { :attacker => {  :num_rolls => 2, :save_type => :none,
                                         :raw_hits => 1, :hit_ratio => 0.5,
                                         :cover_saves => 0, :net_hits => 1 }}
