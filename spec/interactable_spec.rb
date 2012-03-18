@@ -50,19 +50,19 @@ describe DustTactics::Interactable do
       @unit.deploy(@rand_space1)
       @target.deploy(@rand_space2)
       @weapon_line.instance_eval { @type = '0' }  #set range to 0
-      lambda { @unit.attack(@board, @target, @weapon_line)
+      lambda { @unit.attack(@board, @target, [@weapon_line])
       }.should raise_error InvalidAttack, /is not in range to attack!$/
     end
 
     it "should raise an exception when attacking a unit not in a space" do
       @unit.deploy(@rand_space1)
-      lambda { @unit.attack(@board, @target, @weapon_line)
+      lambda { @unit.attack(@board, @target, [@weapon_line])
       }.should raise_error InvalidAttack, "The target isn't in a space!"
     end
 
     it "should raise an exception when the attacker isn't in a space" do
      @target.deploy(@rand_space1)
-     lambda { @unit.attack(@board, @target, @weapon_line)
+     lambda { @unit.attack(@board, @target, [@weapon_line])
      }.should raise_error InvalidAttack, "The attacker isn't in a space!"
     end
 
@@ -70,12 +70,36 @@ describe DustTactics::Interactable do
       @unit.deploy(@rand_space1)
       @target.deploy(@rand_space2)
       @weapon_line.instance_eval { @type = "nonsense"; }
-      lambda  { @unit.attack(@board, @target, @weapon_line) 
+      lambda  { @unit.attack(@board, @target, [@weapon_line]) 
       }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
     end
 
-    it "should correctly take cover into consideration when attacking" do
-      pending
+    it "should correctly take soft cover into consideration when attacking" do
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
+      space = Space.new(0,2)
+      rhino = Units::Rhino.new  and rhino.deploy(space)
+      Units::SoftCover.new.deploy(space)
+      
+      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      cover_saves = 100.times.inject(0) do |memo, i|
+        memo += lara.attack(@board, rhino, [ranged_weapon])[:attacker][:cover_saves]
+      end
+
+      cover_saves.should be > 0
+    end
+    
+    it "should correctly take hard cover into consideration when attacking" do
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
+      space = Space.new(0,2)
+      rhino = Units::Rhino.new  and rhino.deploy(space)
+      Units::HardCover.new.deploy(space)
+      
+      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      cover_saves = 100.times.inject(0) do |memo, i|
+        memo += lara.attack(@board, rhino, [ranged_weapon])[:attacker][:cover_saves]
+      end
+
+      cover_saves.should be > 0
     end
 
     it "should correctly cause damage to the target player with a ranged weapon" do
@@ -84,7 +108,7 @@ describe DustTactics::Interactable do
       rhino_initial_hp = rhino.hit_points
 
       ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
-      battle_report = lara.attack(@board, rhino, ranged_weapon)
+      battle_report = lara.attack(@board, rhino, [ranged_weapon])
       expected_hp   = rhino_initial_hp - battle_report[:attacker][:net_hits]
       rhino.hit_points.should ==  expected_hp   
     end
@@ -95,7 +119,7 @@ describe DustTactics::Interactable do
       lara_initial_hp = lara.hit_points
 
       cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
-      battle_report = rhino.attack(@board, lara, cc_weapon)
+      battle_report = rhino.attack(@board, lara, [cc_weapon])
       expected_hp   = lara_initial_hp - battle_report[:attacker][:net_hits]
       lara.hit_points.should ==  expected_hp   
     end
@@ -106,7 +130,7 @@ describe DustTactics::Interactable do
       rhino_initial_hp = rhino.hit_points
 
       cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
-      battle_report = rhino.attack(@board, lara, cc_weapon)
+      battle_report = rhino.attack(@board, lara, [cc_weapon])
       expected_hp   = rhino_initial_hp - battle_report[:defender][:net_hits]
       rhino.hit_points.should ==  expected_hp   
     end
@@ -116,7 +140,7 @@ describe DustTactics::Interactable do
 
       rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
       lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      battle_report = rhino.attack(@board, lara, rhino.weapon_lines.first) 
+      battle_report = rhino.attack(@board, lara, [rhino.weapon_lines.first]) 
       battle_report[:attacker].should_not be nil
     end
     
@@ -125,15 +149,48 @@ describe DustTactics::Interactable do
 
       rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
       lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      battle_report = rhino.attack(@board, lara, rhino.weapon_lines.first) 
+      battle_report = rhino.attack(@board, lara, [rhino.weapon_lines.first]) 
       battle_report[:defender].should_not be nil
     end
 
-    it "should have the ability to attack with ALL available weapon lines" do
-      pending
+    it "should not return the same number of dice rolled when two viable " << 
+       "weapon lines are ussed to attack" do
+      
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      
+      single_line       = rhino.weapon_lines.first
+      single_line_dice  = single_line.num_dice(lara.type, lara.armor)
+      
+      all_weapons       = rhino.weapon_lines
+      all_weapons_dice  = all_weapons.inject(0) do |sum, wl| 
+        sum += wl.num_dice(lara.type, lara.armor)
+      end
+
+      battle_report = rhino.attack(@board, lara, all_weapons)
+      battle_report[:attacker][:num_rolls].should_not == single_line_dice
+    end
+    
+    it "should return the correct total number of dice when given " << 
+       "more than one weapon line" do
+      
+      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
+      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      
+      single_line       = rhino.weapon_lines.first
+      single_line_dice  = single_line.num_dice(lara.type, lara.armor)
+      
+      all_weapons       = rhino.weapon_lines
+      all_weapons_dice  = all_weapons.inject(0) do |sum, wl| 
+        sum += wl.num_dice(lara.type, lara.armor)
+      end
+
+      battle_report = rhino.attack(@board, lara, all_weapons)
+      battle_report[:attacker][:num_rolls].should == all_weapons_dice
     end
 
   end
+
 
   describe "#los?" do
     before(:each) do

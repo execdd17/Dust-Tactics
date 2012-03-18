@@ -15,38 +15,51 @@ module DustTactics::Interactable
     @space = end_space
   end
 
-  #TODO: Only attacking with one close combat weapon line when there are more 
-  # available leads to a problem. The target is countering with everything
-  # that it has, which means if this method is called again for the attacker's
-  # remaining close combat weapon lines, the target will once again use all its
-  # close combat weapon lines as a reponse!
-  def attack(board, target, weapon_line)
+  # NOTE: You should never call this function twice to attack the same target
+  # in a single round. If you are going to attack a target with more than one
+  # weapon line, then supply them all for a single call. If attacking with a
+  # single weapon line, then pass in an array of size 1
+  def attack(board, target, weapon_lines)
     
-    validate_attack(board, target, weapon_line)     # raise exceptions here
-
-    attacker_dice = weapon_line.num_dice(target.type, target.armor)
     save_type     = get_save_type(target)           # hard, soft, none
     battle_report = {}                              # summary of all attacks
+    cc_weapon_line_queue = Array.new
 	
-    case weapon_line.type
-    when /\d/ then                                  # range attack
-      attacker_outcome = GameEngine.resolve_attack(attacker_dice, save_type)
-      target.take_damage(attacker_outcome[:net_hits])
-      battle_report.merge!(:attacker => attacker_outcome)
-    when 'C' then                                   # close combat attack
-      save_type         = :none
-      attacker_outcome  = GameEngine.resolve_attack(attacker_dice, save_type)
-      target.take_damage(attacker_outcome[:net_hits])
-      battle_report.merge!(:attacker => attacker_outcome)
-      
+    weapon_lines.each do |weapon_line|
+      validate_attack(board, target, weapon_line)     # raise exceptions here
+      attacker_dice = weapon_line.num_dice(target.type, target.armor)
+
+      case weapon_line.type
+      when /\d/ then                                  # range attack
+        attacker_outcome = GameEngine.resolve_attack(attacker_dice, save_type)
+        target.take_damage(attacker_outcome[:net_hits])
+        battle_report.merge!(:attacker => attacker_outcome)
+      when 'C' then                                   # close combat attack
+        cc_weapon_line_queue << weapon_line
+      end
+    end
+
+    # perform 'simultaneous' close combat if such an attack occured
+    unless cc_weapon_line_queue.empty?
+      cc_weapon_line_queue.each do |weapon_line| 
+        attacker_dice = weapon_line.num_dice(target.type, target.armor)
+        save_type         = :none
+        attacker_outcome  = GameEngine.resolve_attack(attacker_dice, save_type)
+        target.take_damage(attacker_outcome[:net_hits])
+        
+        args = [battle_report, attacker_outcome, :attacker]
+        battle_report = GameEngine.combine_reports(*args)
+      end
+        
       counter_weapons = target.weapon_lines.select { |wl| wl.close_combat? } 
-      unless counter_weapons.empty? then
-        counter_weapons.each do |wl|
-          defender_dice     = wl.num_dice(self.type, self.armor)
-          defender_outcome  = GameEngine.resolve_attack(defender_dice, save_type)
-          self.take_damage(defender_outcome[:net_hits])
-          battle_report.merge!(:defender => defender_outcome)
-        end
+      
+      counter_weapons.each do |wl|
+        defender_dice     = wl.num_dice(self.type, self.armor)
+        defender_outcome  = GameEngine.resolve_attack(defender_dice, save_type)
+        self.take_damage(defender_outcome[:net_hits])
+      
+        args = battle_report, defender_outcome, :defender
+        battle_report = GameEngine.combine_reports(*args)
       end
     end
 
@@ -70,6 +83,9 @@ module DustTactics::Interactable
   private
 
   def get_save_type(target)
+    raise InvalidAttack, "The target isn't in a space!" unless 
+      target.space and target.space.non_cover
+
     if Units::HardCover === target.space.cover then
       save_type = :miss
     elsif Units::SoftCover === target.space.cover then
@@ -82,9 +98,6 @@ module DustTactics::Interactable
   def validate_attack(board, target, weapon_line)
     raise InvalidAttack, "The attacker isn't in a space!" unless
       self.space and self.space.non_cover
-
-    raise InvalidAttack, "The target isn't in a space!" unless 
-      target.space and target.space.non_cover
 
     raise InvalidAttack, "#{weapon_line} is not in range to attack!" unless
       weapons_in_range(board, target, self.weapon_lines).include?(weapon_line)

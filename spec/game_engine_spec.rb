@@ -20,10 +20,6 @@ describe DustTactics::GameEngine do
       @num_rolls = rand(1..100)  
     end
     
-    it "should validate that all the hash entries returned" do
-      pending
-    end
-
     it "should not return less than 0 when subtracting hit cover saves" do
       100.times do 
         GameEngine.resolve_attack(@num_rolls, :hit)[:net_hits] 
@@ -59,6 +55,27 @@ describe DustTactics::GameEngine do
         GameEngine.resolve_attack(@num_rolls, :none)[:net_hits].should be <= @num_rolls 
       end
     end
+  end
+  
+  describe ".combine_report" do
+
+    it "should take a battle report and combine a new attacker's report" do
+      battle_report = { :attacker => {  :num_rolls => 2, :save_type => :none,
+                                        :raw_hits => 1, :hit_ratio => 0.5,
+                                        :cover_saves => 0, :net_hits => 1 }}
+
+      attacker_report = { :num_rolls => 4, :save_type => :none, :raw_hits => 3, 
+                          :hit_ratio => 0.75, :cover_saves => 0, :net_hits => 3 }
+
+      combined  = { :attacker => { :num_rolls => 6, :save_type => :none,
+                                   :raw_hits => 4, :hit_ratio => 0.63,
+                                   :cover_saves => 0, :net_hits => 4 }}
+
+
+      br = GameEngine.combine_reports(battle_report, attacker_report, :attacker)
+      br.should == combined
+    end
+
   end
 
   context ".cover_saves" do

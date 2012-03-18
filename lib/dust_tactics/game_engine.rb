@@ -13,6 +13,7 @@ module DustTactics
       p1_results[:hits] > p2_results[:hits] ? player_one : player_two
     end
   
+    # This deals primarily with rolling dice and returning a nice report
     def self.resolve_attack(num_rolls, save_type)
       raw_hits    = DiceEngine.roll(num_rolls)[:hits]
       cover_saves = cover_saves(save_type, raw_hits)
@@ -21,12 +22,39 @@ module DustTactics
         :num_rolls    => num_rolls,
         :save_type    => save_type,
         :raw_hits     => raw_hits, 
-        :hit_ratio    => (raw_hits.to_f / num_rolls).round(4),
+        :hit_ratio    => (raw_hits.to_f / num_rolls).round(2),
         :cover_saves  => cover_saves,
         :net_hits     => [raw_hits - cover_saves, 0].max
       }
     end
+  
+    # Updates a battle report to reflect the individual player report given
+    # their side. For example, a unit attacks with two weapon lines and
+    # calls this method to aggregate the two attacks into one battle report
+    
+    # NOTE: This method will simply merge the two reports together if
+    # battle_report[side] doesn't exist already
+    def self.combine_reports(battle_report, player_report, side)
+      unless battle_report[side] then
+        return battle_report.merge(side => player_report) 
+      end
 
+      battle_report[side].inject( {side => Hash.new} ) do |memo, tuple|
+        key = tuple.first
+
+        case key
+        when :num_rolls, :raw_hits, :cover_saves, :net_hits then 
+          memo[side][key] = battle_report[side][key] += player_report[key]
+        when :hit_ratio   then 
+          new_ratio = (battle_report[side][key].to_f + player_report[key]) / 2
+          memo[side][key] = new_ratio.round(2)
+        when :save_type   then memo[side][key] = battle_report[side][key]
+        end
+        
+        memo
+      end
+    end
+  
     # Takes a save_type of either :hit or :miss and the number of
     # unmitigated hits to see whether any damage is negated.
     # Returns the number of cover saves
