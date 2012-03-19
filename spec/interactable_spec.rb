@@ -112,6 +112,15 @@ describe DustTactics::Interactable do
       defender.hit_points.should ==  expected_hp   
     end
 
+    it "should not cause damage to the attacker when using a ranged weapon" do
+      attacker, defender = @ranged_battle
+      attacker_initial_hp = attacker.hit_points
+
+      ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      battle_report = attacker.attack(@board, defender, [ranged_weapon])
+      attacker.hit_points.should ==  attacker_initial_hp
+    end
+
     it "should cause damage to the defender when using close combat" do
       attacker, defender = @cc_battle
       defender_initial_hp = defender.hit_points
