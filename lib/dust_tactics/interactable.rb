@@ -33,14 +33,15 @@ module DustTactics::Interactable
       when /\d/ then                                  # range attack
         attacker_outcome = GameEngine.resolve_attack(attacker_dice, save_type)
         target.take_damage(attacker_outcome[:net_hits])
-        battle_report.merge!(:attacker => attacker_outcome)
+        args = [battle_report, attacker_outcome, :attacker]
+        battle_report = GameEngine.combine_reports(*args)
       when 'C' then                                   # close combat attack
         cc_weapon_line_queue << weapon_line
       end
     end
 
     # perform 'simultaneous' close combat if such an attack occured
-    unless cc_weapon_line_queue.empty?
+    unless cc_weapon_line_queue.empty? and target.alive?
       cc_weapon_line_queue.each do |weapon_line| 
         attacker_dice = weapon_line.num_dice(target.type, target.armor)
         save_type         = :none
@@ -102,5 +103,4 @@ module DustTactics::Interactable
     raise InvalidAttack, "#{weapon_line} is not in range to attack!" unless
       weapons_in_range(board, target, self.weapon_lines).include?(weapon_line)
   end
-
 end

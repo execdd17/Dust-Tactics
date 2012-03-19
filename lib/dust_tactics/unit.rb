@@ -31,7 +31,12 @@ module DustTactics
       space.occupy(self)
     end
 
+    def alive?
+      @hit_points > 0
+    end
+
     # check if self has line of sight to the supplied unit
+    # TODO: Create blocked spaces and actually use this
     def los?(unit)
       true  
     end

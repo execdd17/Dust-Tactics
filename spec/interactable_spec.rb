@@ -44,6 +44,10 @@ describe DustTactics::Interactable do
       @weapon_line  = @unit.weapon_lines.first
       @rand_space1  = @board.rand_space
       @rand_space2  = @board.rand_space([@rand_space1])
+
+      @ranged_battle  = deployment_factory(@board, :ranged_combat)   
+      @cc_battle      = deployment_factory(@board, :close_combat)    
+      @random_battle  = deployment_factory(@board, :random)       
     end
 
     it "should raise an exception when attacking from out of range" do
@@ -103,94 +107,83 @@ describe DustTactics::Interactable do
     end
 
     it "should correctly cause damage to the target player with a ranged weapon" do
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,2))
-      rhino_initial_hp = rhino.hit_points
+      attacker, defender = @ranged_battle
+      defender_initial_hp = defender.hit_points
 
-      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
-      battle_report = lara.attack(@board, rhino, [ranged_weapon])
-      expected_hp   = rhino_initial_hp - battle_report[:attacker][:net_hits]
-      rhino.hit_points.should ==  expected_hp   
+      ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      battle_report = attacker.attack(@board, defender, [ranged_weapon])
+      expected_hp   = defender_initial_hp - battle_report[:attacker][:net_hits]
+      defender.hit_points.should ==  expected_hp   
     end
 
     it "should cause damage to the defender when using close combat" do
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      lara_initial_hp = lara.hit_points
+      attacker, defender = @cc_battle
+      defender_initial_hp = defender.hit_points
 
-      cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
-      battle_report = rhino.attack(@board, lara, [cc_weapon])
-      expected_hp   = lara_initial_hp - battle_report[:attacker][:net_hits]
-      lara.hit_points.should ==  expected_hp   
+      cc_weapon     = attacker.weapon_lines.select { |wl| wl.type == 'C' }.first
+      battle_report = attacker.attack(@board, defender, [cc_weapon])
+      expected_hp   = defender_initial_hp - battle_report[:attacker][:net_hits]
+      defender.hit_points.should ==  expected_hp   
     end
     
     it "should cause damage to the attaker when both parties have cc weapons" do
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      rhino_initial_hp = rhino.hit_points
+      attacker, defender = @cc_battle
+      attacker_initial_hp = attacker.hit_points
 
-      cc_weapon     = rhino.weapon_lines.select { |wl| wl.type == 'C' }.first
-      battle_report = rhino.attack(@board, lara, [cc_weapon])
-      expected_hp   = rhino_initial_hp - battle_report[:defender][:net_hits]
-      rhino.hit_points.should ==  expected_hp   
+      cc_weapon     = attacker.weapon_lines.select { |wl| wl.type == 'C' }.first
+      battle_report = attacker.attack(@board, defender, [cc_weapon])
+      expected_hp   = attacker_initial_hp - battle_report[:defender][:net_hits]
+      attacker.hit_points.should ==  expected_hp   
     end
 
     it "should return a battle report containing attacker data " <<
        "when both units have close combat weapons to attack with" do
 
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      battle_report = rhino.attack(@board, lara, [rhino.weapon_lines.first]) 
+      attacker, defender = @cc_battle
+      battle_report = attacker.attack(@board, defender, attacker.weapon_lines) 
       battle_report[:attacker].should_not be nil
     end
     
     it "should return a battle report containing defender data " <<
        "when both units have close combat weapons to attack with" do
 
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
-      battle_report = rhino.attack(@board, lara, [rhino.weapon_lines.first]) 
+      attacker, defender = @cc_battle
+      battle_report = attacker.attack(@board, defender, attacker.weapon_lines) 
       battle_report[:defender].should_not be nil
     end
 
     it "should not return the same number of dice rolled when two viable " << 
        "weapon lines are ussed to attack" do
       
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      attacker, defender = @cc_battle
+      single_line       = attacker.weapon_lines.first
+      single_line_dice  = single_line.num_dice(defender.type, defender.armor)
       
-      single_line       = rhino.weapon_lines.first
-      single_line_dice  = single_line.num_dice(lara.type, lara.armor)
-      
-      all_weapons       = rhino.weapon_lines
+      all_weapons       = attacker.weapon_lines
       all_weapons_dice  = all_weapons.inject(0) do |sum, wl| 
-        sum += wl.num_dice(lara.type, lara.armor)
+        sum += wl.num_dice(defender.type, defender.armor)
       end
 
-      battle_report = rhino.attack(@board, lara, all_weapons)
+      battle_report = attacker.attack(@board, defender, all_weapons)
       battle_report[:attacker][:num_rolls].should_not == single_line_dice
     end
     
     it "should return the correct total number of dice when given " << 
        "more than one weapon line" do
       
-      rhino = Units::Rhino.new  and rhino.deploy(Space.new(0,0))
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,1))
+      attacker, defender = @cc_battle
+      single_line       = attacker.weapon_lines.first
+      single_line_dice  = single_line.num_dice(defender.type, defender.armor)
       
-      single_line       = rhino.weapon_lines.first
-      single_line_dice  = single_line.num_dice(lara.type, lara.armor)
-      
-      all_weapons       = rhino.weapon_lines
+      all_weapons       = attacker.weapon_lines
       all_weapons_dice  = all_weapons.inject(0) do |sum, wl| 
-        sum += wl.num_dice(lara.type, lara.armor)
+        sum += wl.num_dice(defender.type, defender.armor)
       end
 
-      battle_report = rhino.attack(@board, lara, all_weapons)
+      battle_report = attacker.attack(@board, defender, all_weapons)
       battle_report[:attacker][:num_rolls].should == all_weapons_dice
     end
-
   end
-
 
   describe "#los?" do
     before(:each) do
@@ -258,3 +251,40 @@ describe DustTactics::Interactable do
     end
   end
 end
+
+# Return the tuple [Attacker, Defender] for the given scenario type
+def deployment_factory(board, scenario)                               
+  case scenario                                                       
+  when :close_combat then                                             
+    units = [Units::Rhino.new, Units::Lara.new, 
+             Units::HeavyLaserGrenadiers.new].shuffle
+    cc_attacker = units.shift
+    cc_defender = units.shift    
+    
+    cc_attacker.deploy(Space.new(0,0))                                
+    cc_defender.deploy(Space.new(0,1))                                
+                                                                      
+    [cc_attacker, cc_defender]         
+  when :ranged_combat then                                            
+    ranged_attacker = [Units::Lara.new, Units::BlackHawk.new, 
+                       Units::HeavyLaserGrenadiers.new].sample
+    defender        = Units::Rhino.new    
+    
+    ranged_attacker.deploy(Space.new(0,0))                            
+    defender.deploy(Space.new(0,1))                                   
+                                                                      
+    [ranged_attacker, defender]   
+  when :random then                                                   
+    units = [Units::Rhino.new, Units::Lara.new].shuffle
+    attacker = units.shift
+    defender = units.shift    
+    
+    rand_space1 =  board.rand_space( [@rand_space1, @rand_space2] )
+    rand_space2 =  board.rand_space( [@rand_space1, @rand_space2, rand_space1] ) 
+    
+    attacker.deploy(rand_space1)                                      
+    defender.deploy(rand_space2)                                      
+    
+    [attacker, defender]                    
+  end                                                                 
+end                                                                   

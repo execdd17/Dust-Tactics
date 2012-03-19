@@ -39,7 +39,7 @@ module DustTactics
         return battle_report.merge(side => player_report) 
       end
 
-      battle_report[side].inject( {side => Hash.new} ) do |memo, tuple|
+      updates = battle_report[side].inject( {side => Hash.new} ) do |memo, tuple|
         key = tuple.first
 
         case key
@@ -53,6 +53,8 @@ module DustTactics
         
         memo
       end
+
+      battle_report.merge(updates)
     end
   
     # Takes a save_type of either :hit or :miss and the number of

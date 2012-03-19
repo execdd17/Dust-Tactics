@@ -35,6 +35,11 @@ describe DustTactics::Unit do
     @unit.army_point.should_not == nil
   end
 
+  it "should know if it's alive (more than 0 hit points)" do
+    @unit.take_damage(@unit.hit_points)
+    @unit.alive?.should == false
+  end
+
   it "should determine when it's inside a space" do
     @unit.deploy(@space)
     @unit.in_space?.should == true
