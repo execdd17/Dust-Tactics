@@ -58,9 +58,4 @@ describe DustTactics::Unit do
     @unit.deploy(Space.new 0,0)
     lambda { @unit.deploy(Space.new 0,1) }.should raise_error InvalidDeployment
   end
-
-  it "should know if it was activated already" do
-    @unit.deploy(Space.new(0,0))
-    @unit.activated?.should == false
-  end
 end

@@ -38,7 +38,7 @@ describe DustTactics::Player do
     @player.remove_unit(@unit).should == []
   end
 
-  it "should move one of its unit and end up there" do
+  it "should move one of its units and end up there" do
     start_space = @player.board.rand_space
     end_space   = @player.board.rand_space( [start_space] )
   
@@ -56,6 +56,10 @@ describe DustTactics::Player do
     @unit.deploy(start_space)
     @player.move_unit(@unit, end_space)
     start_space.non_cover.should == nil
+  end
+
+  it "should take two actions to complete its turn" do
+    pending "The method should call Interactable#take_action twice"
   end
 
 end

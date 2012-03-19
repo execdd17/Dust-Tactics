@@ -38,11 +38,7 @@ describe DustTactics::WeaponLine do
     WeaponLine.new("Sharp Stick", 'C', {}).close_combat?.should == true
   end
 
-  it "should understand the skull inside a combat value" do
-    pending
-  end
-
-  it "should understand the cross inside a combat value" do
+  it "should understand the skull, cross, etc inside a combat value" do
     pending
   end
 end

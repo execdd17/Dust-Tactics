@@ -203,6 +203,21 @@ describe DustTactics::Interactable do
     end
   end
 
+  describe "#activated?" do
+    it "should know if it was activated already" do
+      pending "Activacted means that TWO actions have been taken"
+    end
+  end
+
+  describe "#take_action" do
+
+    it "should perform a move or attack" do
+      pending "For now, let's just say that only one action can be done per " <<
+              "turn. In addition, remove sustained attack, reactive fire, "   <<
+              "and all skills."
+    end
+  end
+
   describe "#weapons_in_range" do
     before(:each) do
       @board        = Board.new(6, 6)
