@@ -3,9 +3,9 @@ require 'spec_helper'
 describe DustTactics::Interactable do 
   describe "#move" do
     before(:each) do
-      @board = Board.new(BOARD_ROWS, BOARD_COLUMNS)
-      @start_space = @board.rand_space
-      @unit = [Units::Rhino.new, Units::Lara.new].sample
+      @board        = Board.new(BOARD_ROWS, BOARD_COLUMNS)
+      @start_space  = @board.rand_space
+      @unit         = rand_interactable_unit
     end
   
     it "should occupy its end point when moving" do
@@ -38,69 +38,65 @@ describe DustTactics::Interactable do
   describe "#attack" do
 
     before(:each) do
-      @board        = Board.new(BOARD_ROWS, BOARD_COLUMNS)
-      @target       = [Units::Rhino.new, Units::Lara.new].sample
-      @unit         = [Units::Rhino.new, Units::Lara.new].sample
-      @weapon_line  = @unit.weapon_lines.first
-      @rand_space1  = @board.rand_space
-      @rand_space2  = @board.rand_space([@rand_space1])
-
+      @board          = Board.new(BOARD_ROWS, BOARD_COLUMNS)
       @ranged_battle  = deployment_factory(@board, :ranged_combat)   
       @cc_battle      = deployment_factory(@board, :close_combat)    
       @random_battle  = deployment_factory(@board, :random)       
     end
 
     it "should raise an exception when attacking from out of range" do
-      @unit.deploy(@rand_space1)
-      @target.deploy(@rand_space2)
-      @weapon_line.instance_eval { @type = '0' }  #set range to 0
-      lambda { @unit.attack(@board, @target, [@weapon_line])
+      attacker, defender = @random_battle
+      weapon_line = rand_weapon_line(attacker).instance_eval { @type = '0' }
+      
+      lambda { attacker.attack(@board, defender, [weapon_line])
       }.should raise_error InvalidAttack, /is not in range to attack!$/
     end
 
     it "should raise an exception when attacking a unit not in a space" do
-      @unit.deploy(@rand_space1)
-      lambda { @unit.attack(@board, @target, [@weapon_line])
+      attacker, defender  = @random_battle.first, rand_interactable_unit
+      weapon_line         = rand_weapon_line(attacker)
+      
+      lambda { attacker.attack(@board, defender, [weapon_line])
       }.should raise_error InvalidAttack, "The target isn't in a space!"
     end
 
     it "should raise an exception when the attacker isn't in a space" do
-     @target.deploy(@rand_space1)
-     lambda { @unit.attack(@board, @target, [@weapon_line])
-     }.should raise_error InvalidAttack, "The attacker isn't in a space!"
+      attacker, defender  = rand_interactable_unit, @random_battle.last
+      weapon_line         = rand_weapon_line(attacker)
+      
+      lambda { attacker.attack(@board, defender, [weapon_line])
+      }.should raise_error InvalidAttack, "The attacker isn't in a space!"
     end
 
     it "should raise an exception when attacking with an unsupported weapon type" do
-      @unit.deploy(@rand_space1)
-      @target.deploy(@rand_space2)
-      @weapon_line.instance_eval { @type = "nonsense"; }
-      lambda  { @unit.attack(@board, @target, [@weapon_line]) 
-      }.should raise_error InvalidAttack,"nonsense is not a supported weapon type"
+      attacker, defender = @random_battle
+      weapon_line = rand_weapon_line(attacker).instance_eval { @type = '^-^' }
+
+      lambda  { attacker.attack(@board, defender, [weapon_line]) 
+      }.should raise_error InvalidAttack,"^-^ is not a supported weapon type"
     end
 
     it "should correctly take soft cover into consideration when attacking" do
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
-      space = Space.new(0,2)
-      rhino = Units::Rhino.new  and rhino.deploy(space)
-      Units::SoftCover.new.deploy(space)
+      attacker, defender = @ranged_battle
+      Units::SoftCover.new.deploy(defender.space)
       
-      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
       cover_saves = 100.times.inject(0) do |memo, i|
-        memo += lara.attack(@board, rhino, [ranged_weapon])[:attacker][:cover_saves]
+        battle_report = attacker.attack(@board, defender, [ranged_weapon])
+        memo += battle_report[:attacker][:cover_saves]
       end
 
       cover_saves.should be > 0
     end
     
     it "should correctly take hard cover into consideration when attacking" do
-      lara  = Units::Lara.new   and lara.deploy(Space.new(0,0))
-      space = Space.new(0,2)
-      rhino = Units::Rhino.new  and rhino.deploy(space)
-      Units::HardCover.new.deploy(space)
+      attacker, defender = @ranged_battle
+      Units::HardCover.new.deploy(defender.space)
       
-      ranged_weapon = lara.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
+      ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
       cover_saves = 100.times.inject(0) do |memo, i|
-        memo += lara.attack(@board, rhino, [ranged_weapon])[:attacker][:cover_saves]
+        battle_report = attacker.attack(@board, defender, [ranged_weapon])
+        memo += battle_report[:attacker][:cover_saves]
       end
 
       cover_saves.should be > 0
@@ -191,8 +187,8 @@ describe DustTactics::Interactable do
       space1 = board.rand_space 
       space2 = board.rand_space([space1])
       
-      @unit1 = [Units::Rhino.new, Units::Lara.new].sample
-      @unit2 = [Units::Rhino.new, Units::Lara.new].sample
+      @unit1 = rand_interactable_unit
+      @unit2 = rand_interactable_unit
 
       @unit1.deploy(space1) 
       @unit2.deploy(space2)
@@ -206,15 +202,6 @@ describe DustTactics::Interactable do
   describe "#activated?" do
     it "should know if it was activated already" do
       pending "Activacted means that TWO actions have been taken"
-    end
-  end
-
-  describe "#take_action" do
-
-    it "should perform a move or attack" do
-      pending "For now, let's just say that only one action can be done per " <<
-              "turn. In addition, remove sustained attack, reactive fire, "   <<
-              "and all skills."
     end
   end
 
@@ -267,39 +254,3 @@ describe DustTactics::Interactable do
   end
 end
 
-# Return the tuple [Attacker, Defender] for the given scenario type
-def deployment_factory(board, scenario)                               
-  case scenario                                                       
-  when :close_combat then                                             
-    units = [Units::Rhino.new, Units::Lara.new, 
-             Units::HeavyLaserGrenadiers.new].shuffle
-    cc_attacker = units.shift
-    cc_defender = units.shift    
-    
-    cc_attacker.deploy(Space.new(0,0))                                
-    cc_defender.deploy(Space.new(0,1))                                
-                                                                      
-    [cc_attacker, cc_defender]         
-  when :ranged_combat then                                            
-    ranged_attacker = [Units::Lara.new, Units::BlackHawk.new, 
-                       Units::HeavyLaserGrenadiers.new].sample
-    defender        = Units::Rhino.new    
-    
-    ranged_attacker.deploy(Space.new(0,0))                            
-    defender.deploy(Space.new(0,1))                                   
-                                                                      
-    [ranged_attacker, defender]   
-  when :random then                                                   
-    units = [Units::Rhino.new, Units::Lara.new].shuffle
-    attacker = units.shift
-    defender = units.shift    
-    
-    rand_space1 =  board.rand_space( [@rand_space1, @rand_space2] )
-    rand_space2 =  board.rand_space( [@rand_space1, @rand_space2, rand_space1] ) 
-    
-    attacker.deploy(rand_space1)                                      
-    defender.deploy(rand_space2)                                      
-    
-    [attacker, defender]                    
-  end                                                                 
-end                                                                   
