@@ -58,8 +58,27 @@ describe DustTactics::Player do
     start_space.non_cover.should == nil
   end
 
-  it "should take two actions to complete its turn" do
-    pending "The method should call Interactable#take_action twice"
+  it "should raise an exception when trying to move a unit it doesn't own" do
+    pending
+  end
+    
+  #TODO: toss this an use a FSM instead! Make it an instance variable of player
+  describe "#perform_turn" do
+
+    before(:each) do
+      board   = Board.new(BOARD_ROWS, BOARD_COLUMNS)
+      @player = Player.new("Franky Four Fingers", "axis", board)
+      @attacker, @defender = rand_interactable_unit, rand_interactable_unit
+    end
+
+    it "should perform a move action" do
+      pending "FSM!"
+    end
+
+    it "should perform an attack action" do
+      pending "FSM!"
+    end
+
   end
 
 end

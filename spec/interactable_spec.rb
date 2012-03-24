@@ -193,27 +193,29 @@ describe DustTactics::Interactable do
   describe "#los?" do
     before(:each) do
       board  = Board.new(BOARD_ROWS, BOARD_COLUMNS)
-      space1 = board.rand_space 
-      space2 = board.rand_space([space1])
-      
-      @unit1 = rand_interactable_unit
-      @unit2 = rand_interactable_unit
-
-      @unit1.deploy(space1) 
-      @unit2.deploy(space2)
+      @unit1, @unit2 = deployment_factory(board, :random)
     end
   
     it "should return true when one unit has line of sight to the other" do
       @unit1.los?(@unit2).should == true
     end
+
+    it "should return false when something is blocking line of sight" do
+      pending "Currently, the idea of obstacles does not exist"
+    end
   end
 
   describe "#activated?" do
     it "should know if it was activated already" do
-      pending "Activacted means that TWO actions have been taken"
+      pending "Activation occurs under various conditions. This would be a " <<
+              "great case for a finate state machine!"
     end
   end
 
+  #TODO: These should not be written in the perspective of particular units
+  # For example, instead of, ... when Rhino is one space away, do:
+  # should return 2 weapon lines when a unit has two close combat weapons
+  # and is located one space away
   describe "#weapons_in_range" do
     before(:each) do
       @board        = Board.new(6, 6)

@@ -1,6 +1,9 @@
+require 'state_machine'
+
 module DustTactics
 
-  class BusyHands < Exception; end
+  class BusyHands     < Exception; end
+  class InvalidAction < Exception; end
 
   class Player
 
@@ -22,6 +25,10 @@ module DustTactics
     def move_unit(unit, end_space)
       raise BusyHands, "#{unit} isn't part of my team" unless @units.index(unit)
       unit.move(end_space)
+    end
+
+    def attack_unit(attacker_unit, target_unit, weapon_lines)
+      attacker_unit.attack(@board, target_unit, weapon_lines)
     end
 
     def total_ap
