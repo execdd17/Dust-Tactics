@@ -2,7 +2,13 @@ DESCRIPTION:
 
 My evolving implementation of the game "Dust Tactics" created by Fantasy Flight Games [http://fantasyflightgames.com]
 
+I am in no way affiliated with Fantasy Flight Games, but if this program seems interesting, I encourage you to buy the actual game!
+
 REQUIREMENTS:
 
-Ruby >= 1.9.2
+Ruby >= 1.9.3
+
+STATUS:
+
+Version 1.0 is in development. Currently, The game can not be played from a central UI and a few remaining components must be designed and implemented. 
 
