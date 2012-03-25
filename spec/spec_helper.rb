@@ -4,10 +4,7 @@ SimpleCov.start do
   add_filter "/spec/"
 end
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib/dust_tactics'))
-
-require 'dust_tactics'
+require './lib/dust_tactics'
 include DustTactics
 
 def rand_weapon_line(unit)

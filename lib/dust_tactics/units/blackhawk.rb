@@ -1,5 +1,3 @@
-require 'unit'
-
 module DustTactics::Units
   class BlackHawk < DustTactics::Unit
     include DustTactics::Weapons

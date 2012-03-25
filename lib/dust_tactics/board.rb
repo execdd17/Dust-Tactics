@@ -1,5 +1,3 @@
-require 'space'
-
 module DustTactics
   class Board
 

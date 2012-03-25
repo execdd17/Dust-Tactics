@@ -1,5 +1,3 @@
-require 'unit'
-
 module DustTactics::Units
   class Rhino < DustTactics::Unit
     include DustTactics::Weapons

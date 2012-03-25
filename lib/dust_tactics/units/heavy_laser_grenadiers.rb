@@ -1,5 +1,3 @@
-require 'unit'
-
 module DustTactics::Units
   class HeavyLaserGrenadiers < DustTactics::Unit
     include DustTactics::Weapons
