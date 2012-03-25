@@ -207,8 +207,10 @@ describe DustTactics::Interactable do
 
   describe "#activated?" do
     it "should know if it was activated already" do
-      pending "Activation occurs under various conditions. This would be a " <<
-              "great case for a finate state machine!"
+      pending "This is more complicated than simply adding an instance" <<
+              "variable inside interactable (unit) because the FSM is " <<
+              "not currently tracking states based on an interactable " <<
+              "but it will need to (I think) in order for this to work"
     end
   end
 

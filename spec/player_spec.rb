@@ -114,7 +114,8 @@ describe DustTactics::Player do
   end
 
   it "should remove the defeated unit from the oponent's units array" do
-    pending
+    pending "This needs to be done in another object that has knowledge " <<
+            "of both players, because units don't know who they belong to"
   end
 
   describe "a turn finate state machine" do
