@@ -79,13 +79,26 @@ module DustTactics
       @units.delete(unit)
       @units
     end
-
+    
+    def deploy_unit(unit, end_space)
+      movement_helper(unit) do
+        unit.deploy(end_space)
+      end
+    end
+    
     def move_unit(unit, end_space)
+      movement_helper(unit) do
+        raise BusyHands, "Only Interactables Can Move" unless unit.respond_to?(:move)
+        unit.move(end_space)
+      end
+    end
+
+    def movement_helper(unit)
       raise BusyHands, "#{unit} isn't part of my team" unless @units.index(unit)
       raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
 
       self.move
-      unit.move(end_space)
+      yield
     end
 
     def attack_unit(attacker_unit, target_unit, weapon_lines)

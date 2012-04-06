@@ -37,6 +37,46 @@ describe DustTactics::Player do
     @player.add_unit(@unit) 
     @player.remove_unit(@unit).should == []
   end
+  
+  it "should deploy a non cover unit and end up there" do
+    start_space = @player.board.rand_space
+  
+    @player.add_unit(@unit) 
+    @player.deploy_unit(@unit, start_space)
+    start_space.non_cover.should == @unit
+  end
+  
+  it "should deploy a cover unit and end up there" do
+    start_space = @player.board.rand_space
+    cover_unit  = Units::HardCover.new
+  
+    @player.add_unit(cover_unit) 
+    @player.deploy_unit(cover_unit, start_space)
+    start_space.cover.should == cover_unit
+  end
+  
+  it "should not allow a player to move a non-interactable" do
+    start_space = @player.board.rand_space
+    end_space   = @player.board.rand_space( [start_space] )
+    cover_unit  = Units::SoftCover.new
+  
+    @player.add_unit(cover_unit)
+    @player.deploy_unit(cover_unit, start_space)
+    
+    lambda do 
+      @player.move_unit(cover_unit, end_space) 
+    end.should raise_error BusyHands, "Only Interactables Can Move" 
+  end
+  
+  it "should move one of its units and end up there" do
+    start_space = @player.board.rand_space
+    end_space   = @player.board.rand_space( [start_space] )
+  
+    @player.add_unit(@unit)
+    @unit.deploy(start_space)
+    @player.move_unit(@unit, end_space)
+    end_space.non_cover.should == @unit
+  end
 
   it "should move one of its units and end up there" do
     start_space = @player.board.rand_space
