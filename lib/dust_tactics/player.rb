@@ -14,9 +14,9 @@ module DustTactics
     attr_reader :name, :team, :units, :board
 
     state_machine :state, :initial => :start do
-
-      # deduct the right tick amount for every state chage
-      after_transition any => any - :end, :do => :deduct_ticks
+      
+      after_transition :end => :start,                :do => :reset_ticks
+      after_transition any  => any - [:end, :start],  :do => :deduct_ticks
 
       after_transition any => any - :end do |player, transition|
         player.finish_turn unless player.more_ticks?
@@ -42,6 +42,10 @@ module DustTactics
         transition all - [:start] => :end
       end
 
+      event :restart do
+        transition [:end] => :start
+      end
+
       state :attacked, :moved, :did_nothing do
         def tick_cost
           1
@@ -62,15 +66,11 @@ module DustTactics
     end
 
     def initialize(name, team, board)
-      @ticks = 2
+      @ticks = @orig_ticks = 2
       @name, @team, @units, @board = name, team, [], board
       super()
     end
-
-    def deduct_ticks
-      @ticks = [@ticks - tick_cost, 0].max
-    end
-
+        
     def add_unit(unit)
       @units << unit
     end
@@ -93,14 +93,6 @@ module DustTactics
       end
     end
 
-    def movement_helper(unit)
-      raise BusyHands, "#{unit} isn't part of my team" unless @units.index(unit)
-      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
-
-      self.move
-      yield
-    end
-
     def attack_unit(attacker_unit, target_unit, weapon_lines)
       raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
       
@@ -117,6 +109,23 @@ module DustTactics
     def total_ap
       @units.inject(0) { |memo, unit| memo += unit.army_point }
     end
+    
+    private
 
+    def reset_ticks
+      @ticks = @orig_ticks
+    end
+
+    def deduct_ticks
+      @ticks = [@ticks - tick_cost, 0].max
+    end
+    
+    def movement_helper(unit)
+      raise BusyHands, "#{unit} isn't part of my team" unless @units.index(unit)
+      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
+
+      self.move
+      yield
+    end
   end
 end

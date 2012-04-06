@@ -141,6 +141,17 @@ describe DustTactics::Player do
       @player.skip_action
     end.should raise_error BigSpender, "Not Enough Ticks!"
   end
+
+  it "should restore the original amount of ticks when restart is triggered" do
+    orig_ticks = @player.ticks
+    
+    until @player.ticks == 0
+      @player.do_nothing
+    end
+
+    @player.restart
+    @player.ticks.should == orig_ticks
+  end
   
   it "should allow the option to skip an action" do
     lambda { @player.skip_action }.should_not raise_error
