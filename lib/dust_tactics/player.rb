@@ -9,9 +9,7 @@ module DustTactics
   class Player
   
     # ticks is loosely a type of currency for changing states
-    attr_accessor :ticks
-      
-    attr_reader :name, :team, :units, :board
+    attr_reader :name, :team, :units, :board, :ticks
 
     state_machine :state, :initial => :start do
       

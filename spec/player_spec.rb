@@ -85,7 +85,7 @@ describe DustTactics::Player do
       end
 
       it "should deduct the correct amount of ticks for a given action" do
-        starting_ticks = @player.ticks= 3
+        starting_ticks = @player.instance_eval { @ticks= 3 }
         @player.activate(@unit)
         @player.sustained_attack
         @player.ticks.should == starting_ticks - @player.tick_cost
@@ -202,7 +202,7 @@ describe DustTactics::Player do
       it "should raise an exception when attempting to move a unit without " << 
          "enough ticks" do
         
-        @player.ticks= 0
+        @player.instance_eval { @ticks= 0 }
         @player.add_unit(@unit)
         @player.activate(@unit)
         @unit.deploy(@start_space)
@@ -215,7 +215,7 @@ describe DustTactics::Player do
       it "should raise an exception when attempting to attack a unit without " << 
          "enough ticks" do
         
-        @player.ticks= 0
+        @player.instance_eval { @ticks= 0 }
         @player.add_unit(@unit)
         @player.activate(@unit)
         @unit.deploy(@start_space)
@@ -228,7 +228,7 @@ describe DustTactics::Player do
       it "should raise an exception when attempting to skip an action without " << 
          "enough ticks" do
         
-        @player.ticks= 0
+        @player.instance_eval { @ticks= 0 }
         @player.add_unit(@unit)
         @player.activate(@unit)
         
