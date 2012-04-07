@@ -1,7 +1,7 @@
 class CoverSaveException < Exception; end
 
 module DustTactics
-  class GameEngine
+  module GameEngine
 
     # Used to determine who gets to place cover first and who starts the round
     def self.initiative(player_one, player_two)
@@ -11,6 +11,12 @@ module DustTactics
       end while p1_results[:hits] == p2_results[:hits]  #ties are lame
 
       p1_results[:hits] > p2_results[:hits] ? player_one : player_two
+    end
+
+    # Returns an array of size two with the winner of the roll at index 0
+    def self.initiative_as_list(player_one, player_two)
+      winner = GameEngine.initiative(player_one, player_two)
+      [winner] + ([player_one, player_two] - [winner])
     end
   
     # This deals primarily with rolling dice and returning a nice report

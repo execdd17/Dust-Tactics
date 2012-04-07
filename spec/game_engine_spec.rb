@@ -13,6 +13,10 @@ describe DustTactics::GameEngine do
       [@allied_player, @axis_player].include?( 
         GameEngine.initiative(@allied_player, @axis_player)).should == true
     end
+
+    it "should return an array when asked" do
+      GameEngine.initiative_as_list(@allied_player, @axis_player).should be_an Array
+    end
   end
 
   context ".resolve attack" do
