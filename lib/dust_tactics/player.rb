@@ -15,31 +15,45 @@ module DustTactics
 
     state_machine :state, :initial => :start do
       
-      after_transition :end => :start,                :do => :reset_ticks
-      after_transition any  => any - [:end, :start],  :do => :deduct_ticks
+      before_transition :on => :activate,   :do => :activate_unit
+      before_transition :on => :move,       :do => :move_unit
+      before_transition :on => :do_nothing, :do => :skip_action
+      before_transition :on => :attack,     :do => :attack_unit
+      before_transition :on => :deploy,     :do => :deploy_unit
+      
+      after_transition any  => any - [:end, :start, :activated], :do => :deduct_ticks
+      after_transition :end => :start, :do => :reset_ticks
 
       after_transition any => any - :end do |player, transition|
         player.finish_turn unless player.more_ticks?
       end
 
+      event :activate do
+        transition [:start] => :activated
+      end
+
       event :move do
-        transition [:start, :moved, :attacked, :did_nothing] => :moved
+        transition [:activated, :moved, :attacked, :did_nothing] => :moved
+      end
+
+      event :deploy do
+        transition [:activated] => :moved
       end
 
       event :attack do
-        transition [:start, :did_nothing, :moved] => :attacked
+        transition [:activated, :did_nothing, :moved] => :attacked
       end
 
       event :do_nothing do
-        transition [:start, :did_nothing, :moved, :attacked] => :did_nothing
+        transition [:activated, :did_nothing, :moved, :attacked] => :did_nothing
       end
 
       event :sustained_attack do
-        transition [:start] => :performed_sustained_attack
+        transition [:activated] => :performed_sustained_attack
       end
 
       event :finish_turn do
-        transition all - [:start] => :end
+        transition all - [:start, :activated] => :end
       end
 
       event :restart do
@@ -80,15 +94,6 @@ module DustTactics
       @units
     end
     
-    def activate_unit(unit)
-      raise BusyHands, "#{unit} isn't part of my team" unless @units.include?(unit)
-      raise BusyHands, "Only interactables can be activated" unless 
-        unit.kind_of?(Interactable)
-      
-      @unit_this_round = unit
-      unit.activate
-    end
-        
     #TODO: Make sure this only is used in the beginning of a game
     # Another object will likely manage that
     def deploy_cover(cover_unit, space)
@@ -99,35 +104,20 @@ module DustTactics
       @units.delete(cover_unit) # it's unncessary to keep track of this
     end
     
-    def deploy_unit(space)
-      action_helper do
-        self.move
-        @unit_this_round.deploy(space)
-      end
-    end
-    
-    def move_unit(space)
-      action_helper do
-        self.move
-        @unit_this_round.move(space)
-      end
-    end
-
-    #TODO: Since the attacking unit is fixed based on who is activated.
-    # I need a way to ensure that arbitrary weapon lines aren't passed
-    def attack_unit(target_unit, weapon_lines)
-      action_helper do
-        self.attack
-        @unit_this_round.attack(@board, target_unit, weapon_lines)
-      end
-    end
-
-    def skip_action
-      action_helper { self.do_nothing }
-    end
-
     def total_ap
       @units.inject(0) { |memo, unit| memo += unit.army_point }
+    end
+
+    def activatable_units
+      @units.reject { |unit| unit.activated? }
+    end
+
+    def has_activatable_units?
+      @units.any? { |unit| !unit.activated? }
+    end
+
+    def reset_round
+      @units.each { |unit| unit.deactivate }
     end
     
     private
@@ -143,7 +133,38 @@ module DustTactics
     def action_helper
       raise BusyHands, "A unit has not been activated yet" unless @unit_this_round
       raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
-      yield
+      yield if block_given?
+    end
+        
+    def activate_unit(transition)
+      unit = transition.args.first
+      raise BusyHands, "#{unit} isn't part of my team" unless @units.include?(unit)
+      raise BusyHands, "Only interactables can be activated" unless 
+        unit.kind_of?(Interactable)
+      
+      @unit_this_round = unit
+      @unit_this_round.activate
+    end
+        
+    def attack_unit(transition)
+      target_unit, weapon_lines = transition.args
+      action_helper do
+        @unit_this_round.attack(@board, target_unit, weapon_lines)
+      end
+    end
+
+    def deploy_unit(transition)
+      space = transition.args.first
+      action_helper { @unit_this_round.deploy(space) }
+    end
+        
+    def move_unit(transition)
+      space = transition.args.first
+      action_helper { @unit_this_round.move(space) }
+    end
+    
+    def skip_action(transition)
+      action_helper 
     end
   end
 end
