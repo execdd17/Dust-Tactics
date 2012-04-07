@@ -42,7 +42,8 @@ describe DustTactics::Player do
     start_space = @player.board.rand_space
   
     @player.add_unit(@unit) 
-    @player.deploy_unit(@unit, start_space)
+    @player.activate_unit(@unit)
+    @player.deploy_unit(start_space)
     start_space.non_cover.should == @unit
   end
   
@@ -51,21 +52,20 @@ describe DustTactics::Player do
     cover_unit  = Units::HardCover.new
   
     @player.add_unit(cover_unit) 
-    @player.deploy_unit(cover_unit, start_space)
+    @player.deploy_cover(cover_unit, start_space)
     start_space.cover.should == cover_unit
   end
   
-  it "should not allow a player to move a non-interactable" do
+  it "should not allow a player to activate a non-interactable" do
     start_space = @player.board.rand_space
     end_space   = @player.board.rand_space( [start_space] )
     cover_unit  = Units::SoftCover.new
   
     @player.add_unit(cover_unit)
-    @player.deploy_unit(cover_unit, start_space)
     
     lambda do 
-      @player.move_unit(cover_unit, end_space) 
-    end.should raise_error BusyHands, "Only Interactables Can Move" 
+      @player.activate_unit(cover_unit)
+    end.should raise_error BusyHands, "Only interactables can be activated" 
   end
   
   it "should move one of its units and end up there" do
@@ -73,33 +73,25 @@ describe DustTactics::Player do
     end_space   = @player.board.rand_space( [start_space] )
   
     @player.add_unit(@unit)
-    @unit.deploy(start_space)
-    @player.move_unit(@unit, end_space)
+    @player.activate_unit(@unit)
+    @player.deploy_unit(start_space)
+    @player.move_unit(end_space)
     end_space.non_cover.should == @unit
   end
 
-  it "should move one of its units and end up there" do
-    start_space = @player.board.rand_space
-    end_space   = @player.board.rand_space( [start_space] )
-  
-    @player.add_unit(@unit)
-    @unit.deploy(start_space)
-    @player.move_unit(@unit, end_space)
-    end_space.non_cover.should == @unit
-  end
-  
   it "should move one of its unit and not still be in the start space" do
     start_space = @player.board.rand_space
     end_space   = @player.board.rand_space( [start_space] )
   
     @player.add_unit(@unit)
-    @unit.deploy(start_space)
-    @player.move_unit(@unit, end_space)
+    @player.activate_unit(@unit)
+    @player.deploy_unit(start_space)
+    @player.move_unit(end_space)
     start_space.non_cover.should == nil
   end
 
-  it "should raise an exception when trying to move a unit it doesn't own" do
-    lambda { @player.move_unit(@unit, nil) }.should raise_error BusyHands
+  it "should raise an exception when trying to activate a unit that it doesn't own" do
+    lambda { @player.activate_unit(@unit)}.should raise_error BusyHands
   end
       
   it "should raise an exception when attempting to move a unit without " << 
@@ -110,10 +102,11 @@ describe DustTactics::Player do
     
     @player.ticks= 0
     @player.add_unit(@unit)
+    @player.activate_unit(@unit)
     @unit.deploy(start_space)
     
     lambda do
-      @player.move_unit(@unit, end_space)
+      @player.move_unit(end_space)
     end.should raise_error BigSpender, "Not Enough Ticks!"
   end
 
@@ -125,10 +118,11 @@ describe DustTactics::Player do
     
     @player.ticks= 0
     @player.add_unit(@unit)
+    @player.activate_unit(@unit)
     @unit.deploy(start_space)
     
     lambda do
-      @player.attack_unit(nil,nil,nil)
+      @player.attack_unit(nil,nil)
     end.should raise_error BigSpender, "Not Enough Ticks!"
   end
 
@@ -136,6 +130,8 @@ describe DustTactics::Player do
      "enough ticks" do
     
     @player.ticks= 0
+    @player.add_unit(@unit)
+    @player.activate_unit(@unit)
     
     lambda do
       @player.skip_action
@@ -154,19 +150,25 @@ describe DustTactics::Player do
   end
   
   it "should allow the option to skip an action" do
-    lambda { @player.skip_action }.should_not raise_error
+    @player.should respond_to(:skip_action)
   end
 
   it "should allow the option to attack a unit" do
-    attacker, defender = deployment_factory(@board, :close_combat)
-    lambda do 
-      @player.attack_unit(attacker, defender, attacker.weapon_lines)
-    end.should_not raise_error
+    @player.should respond_to(:attack_unit).with(2).arguments
   end
+
+  it "should allow the option to perform a sustained attack" do
+    pending "Having this method, and all action methods visible " <<
+            "only when available would we cool"
+  end 
 
   it "should remove the defeated unit from the oponent's units array" do
     pending "This needs to be done in another object that has knowledge " <<
             "of both players, because units don't know who they belong to"
+  end
+
+  it "should select a unit to activate each turn" do
+    @player.should respond_to(:activate_unit).with(1).argument
   end
 
   describe "a turn finate state machine" do

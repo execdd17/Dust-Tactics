@@ -70,7 +70,7 @@ module DustTactics
       @name, @team, @units, @board = name, team, [], board
       super()
     end
-        
+
     def add_unit(unit)
       @units << unit
     end
@@ -80,30 +80,50 @@ module DustTactics
       @units
     end
     
-    def deploy_unit(unit, end_space)
-      movement_helper(unit) do
-        unit.deploy(end_space)
+    def activate_unit(unit)
+      raise BusyHands, "#{unit} isn't part of my team" unless @units.include?(unit)
+      raise BusyHands, "Only interactables can be activated" unless 
+        unit.kind_of?(Interactable)
+      
+      @unit_this_round = unit
+      unit.activate
+    end
+        
+    #TODO: Make sure this only is used in the beginning of a game
+    # Another object will likely manage that
+    def deploy_cover(cover_unit, space)
+      raise BusyHands, "#{cover_unit} isn't part of my team" unless 
+        @units.include?(cover_unit)
+      
+      cover_unit.deploy(space)
+      @units.delete(cover_unit) # it's unncessary to keep track of this
+    end
+    
+    def deploy_unit(space)
+      action_helper do
+        self.move
+        @unit_this_round.deploy(space)
       end
     end
     
-    def move_unit(unit, end_space)
-      movement_helper(unit) do
-        raise BusyHands, "Only Interactables Can Move" unless unit.respond_to?(:move)
-        unit.move(end_space)
+    def move_unit(space)
+      action_helper do
+        self.move
+        @unit_this_round.move(space)
       end
     end
 
-    def attack_unit(attacker_unit, target_unit, weapon_lines)
-      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
-      
-      self.attack
-      attacker_unit.attack(@board, target_unit, weapon_lines)
+    #TODO: Since the attacking unit is fixed based on who is activated.
+    # I need a way to ensure that arbitrary weapon lines aren't passed
+    def attack_unit(target_unit, weapon_lines)
+      action_helper do
+        self.attack
+        @unit_this_round.attack(@board, target_unit, weapon_lines)
+      end
     end
 
     def skip_action
-      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
-
-      self.do_nothing
+      action_helper { self.do_nothing }
     end
 
     def total_ap
@@ -119,12 +139,10 @@ module DustTactics
     def deduct_ticks
       @ticks = [@ticks - tick_cost, 0].max
     end
-    
-    def movement_helper(unit)
-      raise BusyHands, "#{unit} isn't part of my team" unless @units.index(unit)
-      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
 
-      self.move
+    def action_helper
+      raise BusyHands, "A unit has not been activated yet" unless @unit_this_round
+      raise BigSpender, "Not Enough Ticks!" unless self.more_ticks?
       yield
     end
   end
