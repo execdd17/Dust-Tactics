@@ -1,11 +1,28 @@
 # Raised when attempting to move a unit that isn't in a space
 class NotInSpace < Exception; end
 
+class DuplicateActivation < Exception; end
+class DuplicateDeactivation < Exception; end
+
 # Raised when attempting to attack a unit that is not in a space, or
 # with an unsuppored weapon type
 class InvalidAttack < Exception; end
 
 module DustTactics::Interactable
+
+  def activate
+    raise DuplicateActivation, "#{self} was already activated" if @activated
+    @activated = true
+  end
+
+  def deactivate
+    raise DuplicateDeactivation, "#{self} was already deactivated" unless @activated
+    @activated = false
+  end
+
+  def activated?
+    @activated ||= false  # return false instead of nil when undefined
+  end
 
   def move(end_space)
     raise NotInSpace, "#{self.class} isn't in a space!" unless in_space?

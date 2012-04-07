@@ -1,6 +1,36 @@
 require 'spec_helper'
 
 describe DustTactics::Interactable do 
+  describe "#activated?" do
+    before(:each) do
+      @board        = Board.new(BOARD_ROWS, BOARD_COLUMNS)
+      @unit         = rand_interactable_unit
+    end
+
+    it "should not be activated when first created" do
+      @unit.should_not be_activated
+    end
+
+    it "should be activated once signaled" do
+      @unit.activate
+      @unit.should be_activated
+    end
+
+    it "should not be activated after being deactivated" do
+      @unit.activate and @unit.deactivate
+      @unit.should_not be_activated
+    end
+
+    it "should raise an error when trying to activate twice" do
+      @unit.activate
+      lambda { @unit.activate }.should raise_error DuplicateActivation
+    end
+    
+    it "should raise an error when trying to deactivate twice" do
+      lambda { @unit.deactivate }.should raise_error DuplicateDeactivation
+    end
+  end
+
   describe "#move" do
     before(:each) do
       @board        = Board.new(BOARD_ROWS, BOARD_COLUMNS)
@@ -207,10 +237,8 @@ describe DustTactics::Interactable do
 
   describe "#activated?" do
     it "should know if it was activated already" do
-      pending "This is more complicated than simply adding an instance" <<
-              "variable inside interactable (unit) because the FSM is " <<
-              "not currently tracking states based on an interactable " <<
-              "but it will need to (I think) in order for this to work"
+      pending "Activation occurs under various conditions. This would be a " <<
+              "great case for a finate state machine!"
     end
   end
 
