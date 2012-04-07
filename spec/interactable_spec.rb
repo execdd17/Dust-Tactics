@@ -235,13 +235,6 @@ describe DustTactics::Interactable do
     end
   end
 
-  describe "#activated?" do
-    it "should know if it was activated already" do
-      pending "Activation occurs under various conditions. This would be a " <<
-              "great case for a finate state machine!"
-    end
-  end
-
   #TODO: These should not be written in the perspective of particular units
   # For example, instead of, ... when Rhino is one space away, do:
   # should return 2 weapon lines when a unit has two close combat weapons
