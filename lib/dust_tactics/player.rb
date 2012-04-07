@@ -51,7 +51,7 @@ module DustTactics
       end
 
       event :finish_turn do
-        transition all - [:start, :activated] => :end
+        transition all - [:start, :activated, :end] => :end
       end
 
       event :restart do
