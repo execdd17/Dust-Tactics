@@ -7,6 +7,8 @@ end
 require './lib/dust_tactics'
 include DustTactics
 
+BOARD_ROWS, BOARD_COLUMNS = 4, 4
+
 def rand_weapon_line(unit)
   unit.weapon_lines.sample
 end

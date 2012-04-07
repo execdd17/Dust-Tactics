@@ -2,8 +2,6 @@ require 'spec_helper'
 
 describe DustTactics::Board do
   
-  BOARD_ROWS, BOARD_COLUMNS = 4, 4
-
   before(:each) do 
     @board = Board.new(BOARD_ROWS, BOARD_COLUMNS)
   end
