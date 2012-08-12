@@ -12,3 +12,4 @@ STATUS:
 
 Version 1.0 is in development. Currently, The game can not be played from a central UI and a few remaining components must be designed and implemented. 
 
+Build Status: <img src="https://secure.travis-ci.org/execdd17/Dust-Tactics.png" />
