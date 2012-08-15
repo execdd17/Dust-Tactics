@@ -1,7 +1,10 @@
 source :rubygems
 
-gem "awesome_print"
 gem "state_machine", "~> 1.1.2"
+
+group :development do
+  gem "awesome_print"
+end
 
 group :test do
   gem 'simplecov', :require => false
