@@ -5,17 +5,17 @@ describe DustTactics::Space do
   before(:each) do
     @space = Space.new rand(0..10), rand(0..10)
     
-    @cover_unit_stub = mock("cover_unit_stub")
-    @cover_unit_stub.stub!(:cover?).and_return(true)
+    @cover_unit_stub = double("cover_unit_stub")
+    @cover_unit_stub.stub(:cover?).and_return(true)
     
-    @cover_unit_stub2 = mock("cover_unit_stub2")
-    @cover_unit_stub2.stub!(:cover?).and_return(true)
+    @cover_unit_stub2 = double("cover_unit_stub2")
+    @cover_unit_stub2.stub(:cover?).and_return(true)
     
-    @unit_stub = mock("unit_stub")
-    @unit_stub.stub!(:cover?).and_return(false)
+    @unit_stub = double("unit_stub")
+    @unit_stub.stub(:cover?).and_return(false)
     
-    @unit_stub2 = mock("unit_stub2")
-    @unit_stub2.stub!(:cover?).and_return(false)
+    @unit_stub2 = double("unit_stub2")
+    @unit_stub2.stub(:cover?).and_return(false)
   end
 
   it "should be empty when first created" do

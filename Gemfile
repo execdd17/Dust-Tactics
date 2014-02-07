@@ -1,4 +1,4 @@
-source :rubygems
+source 'https://rubygems.org'
 
 gem "state_machine", "~> 1.1.2"
 
