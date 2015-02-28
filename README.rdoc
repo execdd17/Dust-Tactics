@@ -12,4 +12,4 @@ Ruby >= 1.9.3
 
 Version 1.0 is in development. Currently, The game can not be played from a central UI and a few remaining components must be designed and implemented. 
 
-{<img src="https://secure.travis-ci.org/execdd17/Dust-Tactics.png"/>}[http://travis-ci.org]
+{<img src="https://secure.travis-ci.org/execdd17/Dust-Tactics.png"/>}[https://travis-ci.org/execdd17/Dust-Tactics]
