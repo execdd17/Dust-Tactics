@@ -1,5 +1,6 @@
-$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib/dust_tactics'))
-puts $:
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'dust_tactics'
 
 include DustTactics
 include DustTactics::Units

@@ -25,13 +25,13 @@ module DustTactics
       raw_hits    = DiceEngine.roll(num_rolls)[:hits]
       cover_saves = cover_saves(save_type, raw_hits)
       
-      { 
-        :num_rolls    => num_rolls,
-        :save_type    => save_type,
-        :raw_hits     => raw_hits, 
-        :hit_ratio    => (raw_hits.to_f / num_rolls).round(2),
-        :cover_saves  => cover_saves,
-        :net_hits     => [raw_hits - cover_saves, 0].max
+      {
+        num_rolls:             num_rolls,
+        save_type:             save_type,
+        raw_hits:              raw_hits,
+        hit_ratio:            (raw_hits.to_f / num_rolls).round(2),
+        target_cover_saves:    cover_saves,
+        net_hits:              [raw_hits - cover_saves, 0].max
       }
     end
   

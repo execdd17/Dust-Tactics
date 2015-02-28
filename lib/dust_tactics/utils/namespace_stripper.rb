@@ -1,10 +1,10 @@
 module DustTactics
   module Utils
-    module NameSpaceStripper
+    module NamespaceStripper
 
       ## taken from ActiveSupport::Inflector.demodulize
       def to_s
-        path = path.self.class.name
+        path = self.class.name
         if i = path.rindex('::')
           path[(i+2)..-1]
         else

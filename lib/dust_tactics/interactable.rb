@@ -58,7 +58,7 @@ module DustTactics::Interactable
     end
 
     # perform 'simultaneous' close combat if such an attack occured
-    unless cc_weapon_line_queue.empty? and target.alive?
+    if cc_weapon_line_queue.empty? == false and target.alive?
       cc_weapon_line_queue.each do |weapon_line| 
         attacker_dice = weapon_line.num_dice(target.type, target.armor)
         save_type         = :none

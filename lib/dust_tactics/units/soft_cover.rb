@@ -1,5 +1,6 @@
 module DustTactics::Units
   class SoftCover < DustTactics::Unit
+    include DustTactics::Utils::NamespaceStripper
 
     STARTING_HIT_POINTS = 2
     TYPE      = :vehicle

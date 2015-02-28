@@ -13,11 +13,12 @@ module DustTactics
 
     state_machine :state, :initial => :start do
       
-      before_transition :on => :activate,   :do => :activate_unit
-      before_transition :on => :move,       :do => :move_unit
-      before_transition :on => :do_nothing, :do => :skip_action
-      before_transition :on => :attack,     :do => :attack_unit
-      before_transition :on => :deploy,     :do => :deploy_unit
+      before_transition :on => :activate,         :do => :activate_unit
+      before_transition :on => :move,             :do => :move_unit
+      before_transition :on => :do_nothing,       :do => :skip_action
+      before_transition :on => :attack,           :do => :attack_unit
+      before_transition :on => :sustained_attack, :do => :sustained_attack_unit
+      before_transition :on => :deploy,           :do => :deploy_unit
       
       after_transition any  => any - [:end, :start, :activated], :do => :deduct_ticks
       after_transition :end => :start, :do => :reset_ticks
@@ -107,11 +108,11 @@ module DustTactics
     end
 
     def activatable_units
-      @units.reject { |unit| unit.activated? }
+      @units.reject { |unit| unit.activated? && unit.alive? == false }
     end
 
     def has_activatable_units?
-      @units.any? { |unit| !unit.activated? }
+      activatable_units > 0
     end
 
     def reset_round
@@ -143,11 +144,15 @@ module DustTactics
       @unit_this_round = unit
       @unit_this_round.activate
     end
+
+    def sustained_attack_unit(transition)
+      raise 'Not Implemented yet'
+    end
         
     def attack_unit(transition)
       target_unit, weapon_lines = transition.args
       action_helper do
-        @unit_this_round.attack(@board, target_unit, weapon_lines)
+        ap @unit_this_round.attack(@board, target_unit, weapon_lines)
       end
     end
 
