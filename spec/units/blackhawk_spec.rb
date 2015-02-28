@@ -1,10 +1,10 @@
 require 'spec_helper'
 include DustTactics::Weapons
 
-describe DustTactics::Units::BlackHawk do
+describe DustTactics::Units::Blackhawk do
   
   before(:each) do
-    @blackhawk = Units::BlackHawk.new
+    @blackhawk = Units::Blackhawk.new
   end
 
   it "should have 3 hit points" do
