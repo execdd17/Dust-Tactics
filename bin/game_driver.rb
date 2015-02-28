@@ -14,8 +14,8 @@ me = Player.new("Alex", "good guys", b)
 ai = Player.new("John", "bad guys", b)
 
 me.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
-me.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
-ai.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
+# me.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
+# ai.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
 ai.add_unit(ALL_INTERACTABLE_UNITS.sample.new)
 
 [me, ai].each { |player| player.add_unit(SoftCover.new) }
