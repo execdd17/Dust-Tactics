@@ -14,6 +14,7 @@ module DustTactics
     end
 
     # Returns an array of size two with the winner of the roll at index 0
+    # TODO: how is this any better than GameEngine.initiative() ?
     def self.initiative_as_list(player_one, player_two)
       winner = GameEngine.initiative(player_one, player_two)
       [winner] + ([player_one, player_two] - [winner])

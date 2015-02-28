@@ -115,7 +115,19 @@ module DustTactics
     def visual_aid
       @grid.each_with_index do |row, row_index|
         row.each_with_index do |col, col_index|
-          printf(" | %2s,%-2s | ", row_index, col_index)
+          current_space = space(row_index, col_index)
+
+          if current_space.empty?
+            printf(" | %9s,%-8s | ", row_index, col_index)
+          else
+            cover = current_space.cover ?
+                DustTactics::Utils.demodulize(current_space.cover.class.name) : 'NoCover'
+
+            unit = current_space.non_cover ?
+                DustTactics::Utils.demodulize(current_space.non_cover.class.name) : 'NoUnit'
+
+            printf(" | %9s,%-8s | ", cover, unit)
+          end
         end
         puts
       end

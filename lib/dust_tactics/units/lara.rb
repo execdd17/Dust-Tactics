@@ -13,5 +13,9 @@ module DustTactics::Units
       super(HIT_POINTS, TYPE, ARMOR, MOVEMENT, ARMY_POINT)
     end
 
+    def to_s
+      self.class.name
+    end
+
   end
 end
