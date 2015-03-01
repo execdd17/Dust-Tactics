@@ -29,12 +29,12 @@ class ShoesGame
   end
 
   def draw_board
-    @app.clear do
-      @app.stack :margin => 10 do
+    # @app.clear do
+      # @app.stack :margin => 10 do
 
         @app.fill @app.rgb(0, 0, 0, 0.0)
         @app.rect :left => 0, :top => 0, :width => 495, :height => (495 * MULTIPLYER).round
-        @app.background '/home/alex/git_repos/Dust-Tactics/assets/FloorTexture.jpg', height: (495 * MULTIPLYER).round
+        @app.background '/home/alex/git_repos/Dust-Tactics/assets/CrackedEarth.jpg', height: (495 * MULTIPLYER).round, width: (495 * MULTIPLYER).round
 
         @board.each_with_index do |col, col_index|
           col.each_with_index do |cell, row_index|
@@ -44,7 +44,7 @@ class ShoesGame
             # @app.fill @app.rgb(0, 440, 0, 90)
             # @app.strokewidth 1
             @app.stroke @app.rgb(0, 0, 0, 0.85)
-            @app.strokewidth 2
+            @app.strokewidth 1
             @app.nofill
             @app.rect :left => left, :top => top, :width => PIECE_WIDTH, :height => PIECE_HEIGHT
 
@@ -58,9 +58,8 @@ class ShoesGame
             # end
           end
         end
-
-      end
-    end
+      # end
+    # end
   end
 
   def left_top_corner_of_piece(a,b)
@@ -85,10 +84,40 @@ class ShoesGame
 end
 
 
-Shoes.app :width => 520 * ShoesGame::MULTIPLYER, :height => 600 * ShoesGame::MULTIPLYER do
+Shoes.app :width => 1500, :height => 750 do
   game = ShoesGame.new(self)
+  @available_actions = []
 
-  game.draw_board
+  flow width: '100%' do
+
+    stack width: '50%' do
+      game.draw_board
+    end
+
+    flow width: '50%' do
+      flow width: '100%' do
+        tagline strong('Current Action: ')
+        @instruction = tagline "Do something..."
+      end
+
+      # @instruction.replace 'dfsfds'
+
+      flow width: '100%' do
+        tagline 'Your Units: '
+        button "RHINO"
+        button "LARA"
+        button "BLACKHAWK"
+      end
+
+      stack width: '100%' do
+        tagline 'Game info section'
+      end
+
+      stack width: '100%' do
+        tagline 'Card info section'
+      end
+    end
+  end
 
   click do |button, x, y|
     if coords = game.find_piece(x,y)
