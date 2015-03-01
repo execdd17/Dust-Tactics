@@ -38,7 +38,7 @@ module DustTactics::Interactable
   # single weapon line, then pass in an array of size 1
   def attack(board, target, weapon_lines)
     
-    save_type     = get_save_type(target)           # hard, soft, none
+    save_type     = target.get_save_type            # hard, soft, none
     battle_report = {}                              # summary of all attacks
     cc_weapon_line_queue = Array.new
 	
@@ -48,10 +48,10 @@ module DustTactics::Interactable
 
       case weapon_line.type
       when /\d/ then                                  # range attack
-        attacker_outcome = GameEngine.resolve_attack(attacker_dice, save_type)
+        attacker_outcome = DustTactics::GameEngine.resolve_attack(attacker_dice, save_type)
         target.take_damage(attacker_outcome[:net_hits])
-        args = [battle_report, attacker_outcome, :attacker]
-        battle_report = GameEngine.combine_reports(*args)
+        args          = [battle_report, attacker_outcome, :attacker]
+        battle_report = DustTactics::GameEngine.combine_reports(*args)
       when 'C' then                                   # close combat attack
         cc_weapon_line_queue << weapon_line
       end
@@ -62,22 +62,22 @@ module DustTactics::Interactable
       cc_weapon_line_queue.each do |weapon_line| 
         attacker_dice = weapon_line.num_dice(target.type, target.armor)
         save_type         = :none
-        attacker_outcome  = GameEngine.resolve_attack(attacker_dice, save_type)
+        attacker_outcome  = DustTactics::GameEngine.resolve_attack(attacker_dice, save_type)
         target.take_damage(attacker_outcome[:net_hits])
         
-        args = [battle_report, attacker_outcome, :attacker]
-        battle_report = GameEngine.combine_reports(*args)
+        args          = [battle_report, attacker_outcome, :attacker]
+        battle_report = DustTactics::GameEngine.combine_reports(*args)
       end
         
       counter_weapons = target.weapon_lines.select { |wl| wl.close_combat? } 
       
       counter_weapons.each do |wl|
         defender_dice     = wl.num_dice(self.type, self.armor)
-        defender_outcome  = GameEngine.resolve_attack(defender_dice, save_type)
+        defender_outcome  = DustTactics::GameEngine.resolve_attack(defender_dice, save_type)
         self.take_damage(defender_outcome[:net_hits])
       
-        args = battle_report, defender_outcome, :defender
-        battle_report = GameEngine.combine_reports(*args)
+        args          = battle_report, defender_outcome, :defender
+        battle_report = DustTactics::GameEngine.combine_reports(*args)
       end
     end
 
@@ -100,18 +100,18 @@ module DustTactics::Interactable
   
   private
 
-  def get_save_type(target)
-    raise InvalidAttack, "The target isn't in a space!" unless 
-      target.space and target.space.non_cover
-
-    if Units::HardCover === target.space.cover then
-      save_type = :miss
-    elsif Units::SoftCover === target.space.cover then
-      save_type = :hit
-    else 
-      save_type = :none
-    end
-  end
+  # def get_save_type(target)
+  #   raise InvalidAttack, "The target isn't in a space!" unless
+  #     target.space and target.space.non_cover
+  #
+  #   if Units::HardCover === target.space.cover then
+  #     :miss
+  #   elsif Units::SoftCover === target.space.cover then
+  #     :hit
+  #   else
+  #     :none
+  #   end
+  # end
 
   def validate_attack(board, target, weapon_line)
     raise InvalidAttack, "The attacker isn't in a space!" unless

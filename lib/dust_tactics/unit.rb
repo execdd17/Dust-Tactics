@@ -50,5 +50,15 @@ module DustTactics
       false
     end
 
+    def get_save_type
+      if Units::HardCover === space.cover then
+        :miss
+      elsif Units::SoftCover === space.cover then
+        :hit
+      else
+        :none
+      end
+    end
+
   end
 end

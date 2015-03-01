@@ -108,7 +108,7 @@ module DustTactics
     end
 
     def activatable_units
-      @units.reject { |unit| unit.activated? && unit.alive? == false }
+      @units.select { |unit| !unit.activated? && unit.alive? }
     end
 
     def has_activatable_units?
