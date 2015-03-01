@@ -3,10 +3,13 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 # require 'dust_tactics'
 
 class ShoesGame
-  PIECE_WIDTH   = 62
-  PIECE_HEIGHT  = 62
-  TOP_OFFSET    = 15
-  LEFT_OFFSET   = 12
+  # a hack to hopefully not break this code I found
+  MULTIPLYER    = 1.5
+
+  PIECE_WIDTH   = 62 * MULTIPLYER
+  PIECE_HEIGHT  = 62 * MULTIPLYER
+  TOP_OFFSET    = 15 * MULTIPLYER
+  LEFT_OFFSET   = 12 * MULTIPLYER
 
   BOARD_SIZE    = [8,8]
 
@@ -30,8 +33,8 @@ class ShoesGame
       @app.stack :margin => 10 do
 
         @app.fill @app.rgb(0, 0, 0, 0.0)
-        @app.rect :left => 0, :top => 0, :width => 495, :height => 495
-        @app.background '/home/alex/git_repos/Dust-Tactics/assets/Deep-Freeze.jpg', height: 495
+        @app.rect :left => 0, :top => 0, :width => 495, :height => (495 * MULTIPLYER).round
+        @app.background '/home/alex/git_repos/Dust-Tactics/assets/FloorTexture.jpg', height: (495 * MULTIPLYER).round
 
         @board.each_with_index do |col, col_index|
           col.each_with_index do |cell, row_index|
@@ -40,8 +43,8 @@ class ShoesGame
             top = top - TOP_OFFSET
             # @app.fill @app.rgb(0, 440, 0, 90)
             # @app.strokewidth 1
-            @app.stroke @app.rgb(0, 0, 0, 0.25)
-            @app.strokewidth 1
+            @app.stroke @app.rgb(0, 0, 0, 0.85)
+            @app.strokewidth 2
             @app.nofill
             @app.rect :left => left, :top => top, :width => PIECE_WIDTH, :height => PIECE_HEIGHT
 
@@ -82,7 +85,7 @@ class ShoesGame
 end
 
 
-Shoes.app :width => 520, :height => 600 do
+Shoes.app :width => 520 * ShoesGame::MULTIPLYER, :height => 600 * ShoesGame::MULTIPLYER do
   game = ShoesGame.new(self)
 
   game.draw_board
