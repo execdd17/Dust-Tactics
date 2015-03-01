@@ -22,7 +22,7 @@ module DustTactics
     def deploy(space)
       if @space then
         raise InvalidDeployment,
-          "Unit already occupies a space, use move() instead" 
+          "Unit already occupies a space, use move() instead"
       elsif not space
         raise InvalidDeployment, "Deployment Space Invalid"
       end

@@ -1,6 +1,11 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-# require 'dust_tactics'
+Shoes.setup do
+  gem 'awesome_print'
+  gem 'state_machine'
+end
+
+require 'dust_tactics'
 
 class ShoesGame
   # a hack to hopefully not break this code I found
@@ -103,7 +108,7 @@ Shoes.app :width => 1500, :height => 750 do
       # @instruction.replace 'dfsfds'
 
       flow width: '100%' do
-        tagline 'Your Units: '
+        tagline 'Activatable Units: '
         button "RHINO"
         button "LARA"
         button "BLACKHAWK"

@@ -3,7 +3,7 @@ module DustTactics
     module NamespaceStripper
 
       ## taken from ActiveSupport::Inflector.demodulize
-      def to_s
+      def demodulize
         path = self.class.name
         if i = path.rindex('::')
           path[(i+2)..-1]

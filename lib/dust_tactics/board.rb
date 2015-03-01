@@ -118,11 +118,11 @@ module DustTactics
           current_space = space(row_index, col_index)
 
           if current_space.empty?
-            printf(" | %9s,%-20s | ", row_index, col_index)
+            printf(" | %9s,%-24s | ", row_index, col_index)
           else
             cover = current_space.cover ? current_space.cover.to_s : 'NoCover'
             unit  = current_space.non_cover ? current_space.non_cover.to_s : 'NoUnit'
-            printf(" | %9s,%-20s | ", cover, unit)
+            printf(" | %9s,%-24s | ", cover, unit)
           end
         end
         puts

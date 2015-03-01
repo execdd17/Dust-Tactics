@@ -14,5 +14,8 @@ module DustTactics::Units
       super(HIT_POINTS, TYPE, ARMOR, MOVEMENT, ARMY_POINT)
     end
 
+    def to_s
+      "#{demodulize}:#{hit_points}HP"
+    end
   end
 end

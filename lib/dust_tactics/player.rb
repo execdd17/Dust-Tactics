@@ -18,7 +18,7 @@ module DustTactics
       before_transition :on => :do_nothing,       :do => :skip_action
       before_transition :on => :attack,           :do => :attack_unit
       before_transition :on => :sustained_attack, :do => :sustained_attack_unit
-      before_transition :on => :deploy,           :do => :deploy_unit
+      # before_transition :on => :deploy,           :do => :deploy_unit
       
       after_transition any  => any - [:end, :start, :activated], :do => :deduct_ticks
       after_transition :end => :start, :do => :reset_ticks
@@ -35,9 +35,9 @@ module DustTactics
         transition [:activated, :moved, :attacked, :did_nothing] => :moved
       end
 
-      event :deploy do
-        transition [:activated] => :moved
-      end
+      # event :deploy do
+      #   transition [:activated] => :moved
+      # end
 
       event :attack do
         transition [:activated, :did_nothing, :moved] => :attacked
@@ -52,7 +52,7 @@ module DustTactics
       end
 
       event :finish_turn do
-        transition all - [:start, :activated, :end] => :end
+        transition [:attacked, :moved, :performed_sustatined_attack, :did_nothing] => :end
       end
 
       event :restart do
@@ -93,16 +93,16 @@ module DustTactics
       @units
     end
     
-    #TODO: Make sure this only is used in the beginning of a game
-    # Another object will likely manage that
-    def deploy_cover(cover_unit, space)
-      raise BusyHands, "#{cover_unit} isn't part of my team" unless 
-        @units.include?(cover_unit)
-      
-      cover_unit.deploy(space)
-      @units.delete(cover_unit) # it's unncessary to keep track of this
-    end
-    
+    # #TODO: Make sure this only is used in the beginning of a game
+    # # Another object will likely manage that
+    # def deploy_cover(cover_unit, space)
+    #   raise BusyHands, "#{cover_unit} isn't part of my team" unless
+    #     @units.include?(cover_unit)
+    #
+    #   cover_unit.deploy(space)
+    #   @units.delete(cover_unit) # it's unncessary to keep track of this
+    # end
+    #
     def total_ap
       @units.inject(0) { |memo, unit| memo += unit.army_point }
     end
@@ -116,9 +116,18 @@ module DustTactics
     end
 
     def reset_round
+      puts "#{name} is calling reset round"
       @units.each { |unit| unit.deactivate }
     end
-    
+
+    def all_units_dead?
+      @units.none? { |unit| unit.alive? }
+    end
+
+    def self.move_cover(cover_unit, space)
+      cover_unit.space
+    end
+
     private
 
     def reset_ticks
@@ -156,10 +165,10 @@ module DustTactics
       end
     end
 
-    def deploy_unit(transition)
-      space = transition.args.first
-      action_helper { @unit_this_round.deploy(space) }
-    end
+    # def deploy_unit(transition)
+    #   space = transition.args.first
+    #   action_helper { @unit_this_round.deploy(space) }
+    # end
         
     def move_unit(transition)
       space = transition.args.first

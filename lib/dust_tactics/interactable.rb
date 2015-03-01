@@ -25,9 +25,7 @@ module DustTactics::Interactable
   end
 
   def move(end_space)
-    raise NotInSpace, "#{self.class} isn't in a space!" unless in_space?
-
-    @space.evict(:unit)
+    @space.evict(:unit) if in_space?
     end_space.occupy(self)
     @space = end_space
   end

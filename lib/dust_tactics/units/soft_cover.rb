@@ -16,5 +16,8 @@ module DustTactics::Units
       true
     end
 
+    def to_s
+      demodulize
+    end
   end
 end
