@@ -112,7 +112,7 @@ module DustTactics
     end
 
     def has_activatable_units?
-      activatable_units > 0
+      activatable_units.length > 0
     end
 
     def reset_round

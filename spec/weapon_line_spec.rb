@@ -40,5 +40,6 @@ describe DustTactics::WeaponLine do
 
   it "should understand the skull, cross, etc inside a combat value" do
     pending
+    fail
   end
 end

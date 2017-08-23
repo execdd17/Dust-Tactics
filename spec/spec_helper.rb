@@ -41,7 +41,7 @@ def deployment_factory(board, scenario)
                                                                       
     [cc_attacker, cc_defender]         
   when :ranged_combat then                                            
-    ranged_attacker = [Units::Lara.new, Units::BlackHawk.new, 
+    ranged_attacker = [Units::Lara.new, Units::Blackhawk.new, 
                        Units::HeavyLaserGrenadiers.new].sample
     defender        = Units::Rhino.new    
     

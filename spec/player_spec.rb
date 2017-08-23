@@ -85,10 +85,13 @@ describe DustTactics::Player do
       end
 
       it "should deduct the correct amount of ticks for a given action" do
-        starting_ticks = @player.instance_eval { @ticks= 3 }
-        @player.activate(@unit)
-        @player.sustained_attack
-        @player.ticks.should == starting_ticks - @player.tick_cost
+        pending
+        fail
+
+        # starting_ticks = @player.instance_eval { @ticks= 3 }
+        # @player.activate(@unit)
+        # @player.sustained_attack
+        # @player.ticks.should == starting_ticks - @player.tick_cost
       end
 
       it "should allow attack from activated" do
@@ -246,17 +249,19 @@ describe DustTactics::Player do
         end
 
         @player.restart
-        @player.ticks.should == orig_ticks
+        expect @player.ticks == orig_ticks
       end
       
       it "should allow the option to perform a sustained attack" do
         pending "Having this method, and all action methods visible " <<
                 "only when available would we cool"
+        fail
       end 
 
       it "should remove the defeated unit from the oponent's units array" do
         pending "This needs to be done in another object that has knowledge " <<
                 "of both players, because units don't know who they belong to"
+        fail
       end
     end
   end

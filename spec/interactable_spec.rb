@@ -62,6 +62,7 @@ describe DustTactics::Interactable do
 
     it "should use the path finding algorithm instead of just plopping down" do
       pending
+      fail
     end
   end
 
@@ -113,7 +114,7 @@ describe DustTactics::Interactable do
       ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
       cover_saves = 100.times.inject(0) do |memo, i|
         battle_report = attacker.attack(@board, defender, [ranged_weapon])
-        memo += battle_report[:attacker][:cover_saves]
+        memo += battle_report[:attacker][:target_cover_saves]
       end
 
       cover_saves.should be > 0
@@ -126,7 +127,7 @@ describe DustTactics::Interactable do
       ranged_weapon = attacker.weapon_lines.select { |wl| wl.type =~ /\d/ }.first
       cover_saves = 100.times.inject(0) do |memo, i|
         battle_report = attacker.attack(@board, defender, [ranged_weapon])
-        memo += battle_report[:attacker][:cover_saves]
+        memo += battle_report[:attacker][:target_cover_saves]
       end
 
       cover_saves.should be > 0
@@ -232,6 +233,7 @@ describe DustTactics::Interactable do
 
     it "should return false when something is blocking line of sight" do
       pending "Currently, the idea of obstacles does not exist"
+      fail
     end
   end
 
@@ -263,7 +265,7 @@ describe DustTactics::Interactable do
       
       @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,1))
       wls_in_range = @rhino.weapons_in_range(@board, @lara, @rhino.weapon_lines)
-      wls_in_range.each { |wl| (HeavyRocketPunch === wl).should == true }
+      wls_in_range.each { |wl| (Weapons::HeavyRocketPunch === wl).should == true }
     end
     
     it "should return both range weapon lines when Lara is 4 spaces
@@ -271,7 +273,7 @@ describe DustTactics::Interactable do
       
       @rhino.deploy(@board.space(0,0)) and @lara.deploy(@board.space(0,4))
       wls_in_range = @lara.weapons_in_range(@board, @rhino, @lara.weapon_lines)
-      wls_in_range.each { |wl| (MG44Zwei === wl).should == true }
+      wls_in_range.each { |wl| (Weapons::MG44Zwei === wl).should == true }
     end
     
     it "should return an empty array when Lara is out of range" do
